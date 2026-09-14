@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INQUIRA — Protótipo de Apresentação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- LOGO (aba do navegador): troque o href pelo mesmo arquivo/base64 usado em --logo-url -->
+<link rel="icon" type="image/png" href="logo-inquira.png">
+<style>
+  :root{
+    --ink:#0B0B0C;
+    --ink-2:#18181B;
+    --ink-3:#232326;
+    --gold:#C9A227;
+    --gold-soft:#E7D08A;
+    --gold-deep:#8C6F1D;
+    --paper:#F5F1E6;
+    --paper-dim:#E9E2CE;
+    --success:#6E8F63;
+    --danger:#A6543F;
+    --serif:'Times New Roman', Times, serif;
+    --round:'Comfortaa', sans-serif;
+
+    /* ====== LOGO — troque APENAS esta linha para atualizar o logo em toda a página ======
+       Opção A (arquivo separado, precisa estar na mesma pasta do .html ao apresentar):
+         --logo-url: url('logo-inquira.png');
+       Opção B (recomendado p/ apresentação — arquivo único, sem risco de link quebrado):
+         --logo-url: url('data:image/png;base64,COLE_AQUI_O_BASE64_DO_SEU_LOGO'); */
+    --logo-url: url('logo-inquira.png');
+
+    /* Se seu logo for de UMA SÓ COR (ex.: só dourado/branco), ele pode não aparecer bem
+       no painel externo, que tem fundo claro (creme). Se tiver uma versão do logo em preto
+       (ou escura) para fundo claro, troque a linha abaixo. Se não tiver, pode deixar igual
+       à de cima — a versão dourada ainda funciona sobre o creme, só com menos contraste. */
+    --logo-url-light-bg: url('logo-inquira.png');
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    font-family:var(--round);
+    color:var(--ink);
+    min-height:100vh;
+    padding:28px 16px 60px;
+  }
+  /* Classe reutilizável do logo — usada em todos os pontos abaixo.
+     Ela lê --logo-url, então não precisa mexer aqui, só na variável acima. */
+  .logo-mark{
+    background-image: var(--logo-url);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    display:inline-block;
+    border-radius: 80px;   /* ← arredondamento leve, novo */
+  }
+  .logo-mark.on-light{
+    background-image: var(--logo-url-light-bg);
+  }
+
+  .stage-header{
+    max-width:920px;
+    margin:0 auto 22px;
+    text-align:center;
+  }
+  .stage-header .brand{
+    font-family:var(--serif);
+    font-size:14px;
+    letter-spacing:2px;
+    color:var(--gold-deep);
+    margin-bottom:6px;
+  }
+  .stage-header h1{
+    font-family:var(--serif);
+    font-size:26px;
+    font-weight:400;
+    margin:0 0 4px;
+    color:var(--ink);
+  }
+  .stage-header p{
+    font-size:13px;
+    color:#5b5747;
+    margin:0;
+  }
+
+  .controls{
+    max-width:920px;
+    margin:0 auto 18px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .nav-arrow{
+    flex:0 0 auto;
+    width:38px;height:38px;
+    border-radius:50%;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    font-size:16px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s ease;
+  }
+  .nav-arrow:hover{background:var(--gold-deep);border-color:var(--gold-deep);}
+
+  .pill-track{
+    flex:1;
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding:4px 2px;
+    scrollbar-width:thin;
+  }
+  .pill{
+    flex:0 0 auto;
+    padding:8px 14px;
+    border-radius:20px;
+    border:1px solid #cfc7ab;
+    background:#fff;
+    font-family:var(--round);
+    font-size:12.5px;
+    color:#4b4736;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all .15s ease;
+  }
+  .pill.active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:var(--gold-soft);
+  }
+
+  .stage-note{
+    max-width:920px;
+    margin:0 auto 22px;
+    text-align:center;
+    font-size:12px;
+    color:#8a836a;
+  }
+
+  /* ---------- PHONE FRAME ---------- */
+  .phone-wrap{
+    display:flex;
+    justify-content:center;
+  }
+  .phone{
+    width:360px;
+    height:740px;
+    background:var(--ink);
+    border-radius:44px;
+    padding:14px;
+    box-shadow:0 0 0 2px var(--gold-deep), 0 30px 60px -20px rgba(0,0,0,.45);
+    position:relative;
+  }
+  .phone-screen{
+    width:100%;height:100%;
+    background:var(--ink);
+    border-radius:30px;
+    overflow:hidden;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .status-bar{
+    height:34px;
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 22px;
+    color:var(--paper);
+    font-size:12px;
+    font-family:var(--round);
+    font-weight:600;
+  }
+  .status-bar .icons{display:flex;gap:5px;align-items:center;}
+  .status-bar .bars span{display:inline-block;width:3px;height:8px;background:var(--paper);margin-right:1px;border-radius:1px;}
+  .status-bar .battery{width:18px;height:9px;border:1px solid var(--paper);border-radius:2px;position:relative;display:inline-block;}
+  .status-bar .battery::after{content:'';position:absolute;left:1px;top:1px;bottom:1px;width:70%;background:var(--paper);border-radius:1px;}
+
+  .screen-body{
+    flex:1;
+    overflow-y:auto;
+    padding:16px 18px 10px;
+    color:var(--paper);
+  }
+  .screen-body::-webkit-scrollbar{width:0;}
+
+  .bottom-nav{
+    flex:0 0 auto;
+    display:flex;
+    justify-content:space-around;
+    padding:10px 8px 16px;
+    border-top:1px solid #2a2a2d;
+  }
+  .bottom-nav .item{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    font-size:9.5px;color:#7a7a80;
+    cursor:pointer;
+  }
+  .bottom-nav .item.active{color:var(--gold);}
+  .bottom-nav .dot{width:18px;height:18px;border-radius:6px;border:1.4px solid currentColor;}
+
+  .screen{display:none;flex-direction:column;height:100%;}
+  .screen.active{display:flex;}
+
+  /* ---------- SHARED UI ---------- */
+  h2.h-serif{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:20px;
+    margin:0 0 2px;
+    color:var(--paper);
+  }
+  .muted{color:#9c9a90;font-size:12px;}
+  .card{
+    background:var(--ink-2);
+    border:1px solid #2b2b2e;
+    border-radius:10px;
+    padding:14px;
+  }
+  .hairline{
+    height:1px;
+    background:linear-gradient(to right, transparent, var(--gold), transparent);
+    margin:14px 0;
+  }
+  .btn-gold{
+    background:var(--gold);
+    color:var(--ink);
+    border:none;
+    border-radius:10px;
+    padding:13px;
+    font-family:var(--round);
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    width:100%;
+    transition:filter .15s ease;
+  }
+  .btn-gold:hover{filter:brightness(1.08);}
+  .btn-gold:disabled{background:#4a4636;color:#8a856c;cursor:not-allowed;}
+  .btn-ghost{
+    background:transparent;
+    border:1px solid #3a3a3d;
+    color:var(--paper);
+    border-radius:10px;
+    padding:11px;
+    font-family:var(--round);
+    font-size:13px;
+    cursor:pointer;
+    width:100%;
+  }
+  .xp-bar-track{
+    height:8px;background:#2b2b2e;border-radius:6px;overflow:hidden;
+  }
+  .xp-bar-fill{
+    height:100%;background:linear-gradient(to right, var(--gold-deep), var(--gold));
+    border-radius:6px;
+  }
+  .avatar{
+    width:46px;height:46px;border-radius:50%;
+    background:var(--ink-3);
+    border:2px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif);font-size:16px;color:var(--gold-soft);
+    flex:0 0 auto;
+  }
+  .avatar.lg{width:84px;height:84px;font-size:26px;}
+
+  /* ===================== LOGIN ===================== */
+  #screen-login .screen-body{
+    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    text-align:center;
+    padding:20px 26px;
+  }
+  .wordmark-row{display:flex;align-items:center;gap:14px;margin-bottom:34px;}
+  .wordmark-row .rule{width:34px;height:1px;background:var(--gold);}
+  .wordmark{font-family:var(--serif);font-size:30px;letter-spacing:3px;color:var(--paper);}
+  .mode-toggle{
+    display:flex;width:100%;background:var(--ink-2);border-radius:10px;padding:4px;margin-bottom:26px;
+  }
+  .mode-toggle button{
+    flex:1;padding:9px;border:none;background:transparent;color:#9c9a90;
+    font-family:var(--round);font-size:12.5px;border-radius:8px;cursor:pointer;
+  }
+  .mode-toggle button.active{background:var(--gold);color:var(--ink);font-weight:700;}
+  .field{
+    width:100%;text-align:left;margin-bottom:12px;
+  }
+  .field label{font-size:11px;color:#9c9a90;display:block;margin-bottom:5px;}
+  .field input{
+    width:100%;background:var(--ink-2);border:1px solid #2f2f32;border-radius:9px;
+    padding:11px 12px;color:var(--paper);font-family:var(--round);font-size:13px;
+  }
+  .field input:focus{outline:1px solid var(--gold);}
+  .login-footnote{margin-top:16px;font-size:11.5px;color:#8a887d;}
+  .login-footnote span{color:var(--gold-soft);cursor:pointer;}
+
+  /* ===================== HOME ===================== */
+  .greet-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .xp-strip{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .xp-strip .lvl{font-family:var(--serif);font-size:13px;color:var(--gold-soft);}
+  .continue-card{margin-bottom:18px;}
+  .continue-card .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+  .continue-card .top .tag{font-size:10.5px;color:#9c9a90;}
+  .subject-row{display:flex;gap:10px;overflow-x:auto;margin-bottom:18px;padding-bottom:4px;}
+  .subject-chip{
+    flex:0 0 auto;width:84px;padding:12px 10px;border-radius:10px;background:var(--ink-2);
+    border:1px solid #2b2b2e;text-align:center;font-size:11px;
+  }
+  .subject-chip .ic{font-size:18px;margin-bottom:6px;}
+  .tiles-row{display:flex;gap:10px;}
+  .tile{
+    flex:1;background:var(--ink-2);border:1px solid var(--gold-deep);border-radius:10px;
+    padding:14px 10px;text-align:center;cursor:pointer;
+  }
+  .tile .ic{font-size:20px;margin-bottom:6px;}
+  .tile .lbl{font-family:var(--serif);font-size:13px;color:var(--paper);}
+
+  /* ===================== PROFILE ===================== */
+  .profile-head{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:16px;}
+  .badge-pill{
+    margin-top:8px;display:inline-block;background:var(--ink-2);border:1px solid var(--gold);
+    color:var(--gold-soft);font-size:11px;padding:4px 12px;border-radius:20px;
+  }
+  .stat-trio{display:flex;gap:8px;margin-bottom:18px;}
+  .stat-tile{flex:1;text-align:center;padding:12px 4px;}
+  .stat-tile .num{font-family:var(--serif);font-size:19px;color:var(--gold-soft);}
+  .stat-tile .lbl{font-size:10px;color:#9c9a90;margin-top:2px;}
+  .section-title{font-size:11.5px;color:#9c9a90;letter-spacing:.4px;margin:16px 0 8px;}
+  .ach-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .ach{
+    aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    font-size:18px;background:var(--ink-2);border:1px solid #2b2b2e;
+  }
+  .ach.earned{background:linear-gradient(145deg,#2a230f,#1c1a10);border-color:var(--gold);}
+  .ach.locked{opacity:.35;filter:grayscale(1);}
+  .mastery-row{margin-bottom:10px;}
+  .mastery-row .mtop{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px;}
+  .activity-item{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #232326;font-size:12px;}
+  .activity-item .plus{color:var(--gold-soft);font-family:var(--serif);}
+
+  /* ===================== LEARNING PATH ===================== */
+  .path-list{position:relative;padding-left:26px;}
+  .path-list::before{
+    content:'';position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:#2b2b2e;
+  }
+  .path-item{position:relative;padding:12px 0 12px 14px;}
+  .path-item .node{
+    position:absolute;left:-26px;top:14px;width:19px;height:19px;border-radius:50%;
+    background:var(--ink);border:2px solid #3a3a3d;display:flex;align-items:center;justify-content:center;
+    font-size:10px;color:#6c6a62;
+  }
+  .path-item.done .node{background:var(--gold);border-color:var(--gold);color:var(--ink);}
+  .path-item.current .node{
+    border-color:var(--gold);color:var(--gold);
+    box-shadow:0 0 0 0 rgba(201,162,39,.5);
+    animation:pulse 1.8s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(201,162,39,.45);}
+    70%{box-shadow:0 0 0 9px rgba(201,162,39,0);}
+    100%{box-shadow:0 0 0 0 rgba(201,162,39,0);}
+  }
+  .path-item .card{cursor:pointer;}
+  .path-item.locked .card{opacity:.45;cursor:not-allowed;}
+  .path-item .card .name{font-size:13.5px;}
+  .path-item .card .meta{font-size:10.5px;color:#9c9a90;margin-top:3px;}
+
+  /* ===================== LESSON ===================== */
+  .video-box{
+    background:#000;border-radius:10px;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+    border:1px solid #2b2b2e;
+  }
+  .play-btn{
+    width:52px;height:52px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;
+    color:var(--ink);font-size:18px;cursor:pointer;
+  }
+  .tab-pill-row{display:flex;background:var(--ink-2);border-radius:10px;padding:4px;margin-bottom:14px;}
+  .tab-pill-row button{flex:1;background:transparent;border:none;padding:8px;font-family:var(--round);font-size:12px;color:#9c9a90;border-radius:8px;cursor:pointer;}
+  .tab-pill-row button.active{background:var(--gold);color:var(--ink);font-weight:700;}
+  .lesson-idx-item{display:flex;gap:10px;padding:8px 0;font-size:12px;border-bottom:1px solid #232326;}
+  .lesson-idx-item .time{color:var(--gold-soft);font-family:var(--serif);flex:0 0 auto;width:44px;}
+  .resource-item{display:flex;align-items:center;gap:10px;padding:10px;background:var(--ink-2);border-radius:8px;margin-bottom:8px;font-size:12px;}
+
+  /* ===================== EXERCISES ===================== */
+  .q-progress{font-size:11px;color:#9c9a90;margin-bottom:6px;}
+  .q-text{font-family:var(--serif);font-size:16px;line-height:1.4;margin-bottom:14px;}
+  .option{
+    display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid #2b2b2e;border-radius:10px;
+    margin-bottom:9px;cursor:pointer;font-size:13px;background:var(--ink-2);
+  }
+  .option .letter{
+    width:22px;height:22px;border-radius:50%;border:1px solid #4a4a4e;display:flex;align-items:center;justify-content:center;
+    font-size:11px;flex:0 0 auto;
+  }
+  .option.selected{border-color:var(--gold);}
+  .option.selected .letter{background:var(--gold);color:var(--ink);border-color:var(--gold);}
+  .option.correct{border-color:var(--success);background:#1c2a1a;}
+  .option.incorrect{border-color:var(--danger);background:#2a1c19;}
+  .explain-box{
+    margin-top:6px;padding:12px;background:var(--ink-2);border-left:3px solid var(--gold);border-radius:6px;font-size:12px;color:#c9c6ba;
+  }
+  .results-box{text-align:center;padding:34px 10px;}
+  .results-box .big{font-family:var(--serif);font-size:38px;color:var(--gold-soft);}
+
+  /* ===================== SPEED QUIZ ===================== */
+  .timer-track{height:9px;border-radius:5px;background:#2b2b2e;overflow:hidden;margin-bottom:16px;}
+  .timer-fill{height:100%;width:100%;background:var(--gold);transition:width .2s linear, background .3s ease;}
+  .quiz-topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .quiz-score{font-family:var(--serif);font-size:20px;color:var(--gold-soft);}
+  .combo-badge{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);
+    background:var(--gold);color:var(--ink);padding:10px 18px;border-radius:30px;font-weight:700;font-size:14px;
+    transition:transform .25s ease;pointer-events:none;
+  }
+  .combo-badge.show{transform:translate(-50%,-50%) scale(1);}
+
+  /* ===================== PROGRESS ===================== */
+  .heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:6px;}
+  .heat-cell{aspect-ratio:1;border-radius:3px;background:#232326;}
+
+  /* ===================== MOCK EXAM ===================== */
+  .exam-timer{
+    display:flex;justify-content:space-between;align-items:center;background:var(--ink-2);
+    border:1px solid var(--gold-deep);border-radius:10px;padding:10px 14px;margin-bottom:14px;
+  }
+  .exam-timer .t{font-family:var(--serif);font-size:19px;color:var(--gold-soft);}
+  .nav-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:16px;}
+  .nav-grid .n{
+    aspect-ratio:1;border-radius:6px;border:1px solid #3a3a3d;display:flex;align-items:center;justify-content:center;
+    font-size:10px;color:#9c9a90;cursor:pointer;background:var(--ink-2);
+  }
+  .nav-grid .n.answered{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:700;}
+  .area-row{margin-bottom:10px;}
+  .area-row .atop{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px;}
+
+  /* ===================== AI CHAT ===================== */
+  .chat-scroll{display:flex;flex-direction:column;gap:10px;}
+  .bubble{max-width:78%;padding:10px 13px;border-radius:14px;font-size:12.5px;line-height:1.45;}
+  .bubble.user{align-self:flex-end;background:var(--gold);color:var(--ink);border-bottom-right-radius:4px;}
+  .bubble.ai{align-self:flex-start;background:var(--ink-2);border:1px solid #2b2b2e;border-bottom-left-radius:4px;}
+  .typing{align-self:flex-start;display:flex;gap:4px;padding:10px 13px;background:var(--ink-2);border-radius:14px;border-bottom-left-radius:4px;}
+  .typing span{width:5px;height:5px;border-radius:50%;background:#9c9a90;animation:blink 1.2s infinite;}
+  .typing span:nth-child(2){animation-delay:.2s;}
+  .typing span:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{0%,80%,100%{opacity:.25;}40%{opacity:1;}}
+  .chip-row{display:flex;gap:8px;margin:10px 0;}
+  .chip{background:transparent;border:1px solid var(--gold);color:var(--gold-soft);font-size:11px;padding:7px 12px;border-radius:20px;cursor:pointer;}
+  .chat-input-row{display:flex;gap:8px;padding-top:10px;border-top:1px solid #232326;}
+  .chat-input-row input{
+    flex:1;background:var(--ink-2);border:1px solid #2f2f32;border-radius:20px;padding:10px 14px;color:var(--paper);font-family:var(--round);font-size:12.5px;
+  }
+  .send-btn{
+    width:38px;height:38px;border-radius:50%;border:none;background:#3a3a3d;color:#7a7a80;cursor:pointer;font-size:14px;
+    transition:all .15s ease;
+  }
+  .send-btn.ready{background:var(--gold);color:var(--ink);}
+</style>
+</head>
+<body>
+
+  <div class="stage-header">
+<!-- painel externo -->
+<div class="logo-mark on-light" ... style="width:170px;height:52px;margin:0 auto 8px;"></div>
+    <h1 id="screenTitle">Login / Cadastro</h1>
+    <p>Protótipo de apresentação — clique nas telas abaixo ou use as setas</p>
+  </div>
+
+  <div class="controls">
+    <button class="nav-arrow" onclick="prevScreen()">‹</button>
+    <div class="pill-track" id="pillTrack"></div>
+    <button class="nav-arrow" onclick="nextScreen()">›</button>
+  </div>
+  <div class="stage-note">Tela <span id="screenIndex">1</span> de <span id="screenTotal">10</span> — funciona offline, sem depender de nenhuma ferramenta externa</div>
+
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="icons">
+            <span class="bars"><span></span><span></span><span></span><span></span></span>
+            <span class="battery"></span>
+          </span>
+        </div>
+
+        <!-- ============ LOGIN ============ -->
+        <div class="screen active" id="screen-login">
+          <div class="screen-body">
+            <!-- LOGO (dentro do app, tela de Login): ponto mais nobre para o logo -->
+            <div class="wordmark-row"><div class="rule"></div><div class="logo-mark" ... style="width:190px;height:56px;"></div><div class="rule"></div></div>
+            <div class="mode-toggle">
+              <button class="active" id="loginModeBtn" onclick="setLoginMode('login')">Entrar</button>
+              <button id="signupModeBtn" onclick="setLoginMode('signup')">Cadastrar</button>
+            </div>
+            <div class="field" id="nameField" style="display:none;">
+              <label>Nome</label>
+              <input type="text" placeholder="Como podemos te chamar?">
+            </div>
+            <div class="field">
+              <label>E-mail</label>
+              <input type="email" placeholder="voce@email.com">
+            </div>
+            <div class="field">
+              <label>Senha</label>
+              <input type="password" placeholder="••••••••">
+            </div>
+            <button class="btn-gold" id="loginSubmitBtn" style="margin-top:6px;">Entrar</button>
+            <div class="login-footnote"><span>Esqueci minha senha</span></div>
+          </div>
+        </div>
+
+        <!-- ============ HOME ============ -->
+        <div class="screen" id="screen-home">
+          <div class="screen-body">
+            <div class="greet-row">
+              <div>
+                <div class="muted">Boa tarde</div>
+                <h2 class="h-serif">Barbara</h2>
+              </div>
+              <div class="avatar">BK</div>
+            </div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="xp-strip"><span class="lvl">Nível 7 · Estudiosa</span><span class="muted">2.480 XP</span></div>
+              <div class="xp-bar-track"><div class="xp-bar-fill" style="width:62%;"></div></div>
+            </div>
+            <div class="card continue-card" onclick="goTo('screen-path')" style="cursor:pointer;">
+              <div class="top"><span class="tag">CONTINUAR ESTUDANDO</span><span class="tag">68%</span></div>
+              <div class="h-serif" style="font-size:15px;">Trigonometria</div>
+              <div class="xp-bar-track" style="margin-top:8px;"><div class="xp-bar-fill" style="width:68%;"></div></div>
+            </div>
+            <div class="section-title">TRILHAS</div>
+            <div class="subject-row">
+              <div class="subject-chip"><div class="ic">∑</div>Matemática</div>
+              <div class="subject-chip"><div class="ic">✎</div>Português</div>
+              <div class="subject-chip"><div class="ic">⚛</div>Física</div>
+              <div class="subject-chip"><div class="ic">⚗</div>Química</div>
+              <div class="subject-chip"><div class="ic">🌍</div>Geografia</div>
+            </div>
+            <div class="tiles-row">
+              <div class="tile" onclick="goTo('screen-exam')"><div class="ic">⏱</div><div class="lbl">Simulado</div></div>
+              <div class="tile" onclick="goTo('screen-quiz')"><div class="ic">⚡</div><div class="lbl">Speed Quiz</div></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="item active" onclick="goTo('screen-home')"><div class="dot"></div>Início</div>
+            <div class="item" onclick="goTo('screen-path')"><div class="dot"></div>Trilhas</div>
+            <div class="item" onclick="goTo('screen-progress')"><div class="dot"></div>Progresso</div>
+            <div class="item" onclick="goTo('screen-chat')"><div class="dot"></div>IA</div>
+            <div class="item" onclick="goTo('screen-profile')"><div class="dot"></div>Perfil</div>
+          </div>
+        </div>
+
+        <!-- ============ PROFILE ============ -->
+        <div class="screen" id="screen-profile">
+          <div class="screen-body">
+            <div class="profile-head">
+              <div class="avatar lg">BK</div>
+              <h2 class="h-serif" style="margin-top:10px;">Barbara Karolinny</h2>
+              <div class="badge-pill">🏅 Estudiosa Nível 7</div>
+            </div>
+            <div class="stat-trio">
+              <div class="card stat-tile"><div class="num">2.480</div><div class="lbl">XP total</div></div>
+              <div class="card stat-tile"><div class="num">12</div><div class="lbl">Sequência</div></div>
+              <div class="card stat-tile"><div class="num">#34</div><div class="lbl">Ranking</div></div>
+            </div>
+            <div class="xp-bar-track"><div class="xp-bar-fill" style="width:62%;"></div></div>
+            <div class="muted" style="margin-top:5px;">620 XP para o Nível 8</div>
+
+            <div class="section-title">CONQUISTAS</div>
+            <div class="ach-grid">
+              <div class="ach earned">🏆</div><div class="ach earned">🔥</div><div class="ach earned">📚</div><div class="ach locked">🎯</div>
+              <div class="ach earned">⚡</div><div class="ach locked">🧠</div><div class="ach locked">🌟</div><div class="ach locked">👑</div>
+            </div>
+
+            <div class="section-title">DOMÍNIO POR MATÉRIA</div>
+            <div class="mastery-row"><div class="mtop"><span>Matemática</span><span>80%</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:80%;"></div></div></div>
+            <div class="mastery-row"><div class="mtop"><span>Português</span><span>65%</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:65%;"></div></div></div>
+            <div class="mastery-row"><div class="mtop"><span>Física</span><span>44%</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:44%;"></div></div></div>
+
+            <div class="section-title">ATIVIDADE RECENTE</div>
+            <div class="activity-item"><span>Concluiu: Lei dos Senos</span><span class="plus">+50</span></div>
+            <div class="activity-item"><span>Speed Quiz: Frações</span><span class="plus">+80</span></div>
+            <div class="activity-item"><span>Simulado ENEM #3</span><span class="plus">+210</span></div>
+          </div>
+          <div class="bottom-nav">
+            <div class="item" onclick="goTo('screen-home')"><div class="dot"></div>Início</div>
+            <div class="item" onclick="goTo('screen-path')"><div class="dot"></div>Trilhas</div>
+            <div class="item" onclick="goTo('screen-progress')"><div class="dot"></div>Progresso</div>
+            <div class="item" onclick="goTo('screen-chat')"><div class="dot"></div>IA</div>
+            <div class="item active" onclick="goTo('screen-profile')"><div class="dot"></div>Perfil</div>
+          </div>
+        </div>
+
+        <!-- ============ LEARNING PATH ============ -->
+        <div class="screen" id="screen-path">
+          <div class="screen-body">
+            <h2 class="h-serif">Trilha: Trigonometria</h2>
+            <div class="muted" style="margin-bottom:14px;">4 de 6 módulos concluídos</div>
+            <div class="path-list">
+              <div class="path-item done"><div class="node">✓</div><div class="card"><div class="name">Ângulos e Triângulos</div><div class="meta">Concluído · +40 XP</div></div></div>
+              <div class="path-item done"><div class="node">✓</div><div class="card"><div class="name">Seno e Cosseno</div><div class="meta">Concluído · +40 XP</div></div></div>
+              <div class="path-item done"><div class="node">✓</div><div class="card"><div class="name">Tangente</div><div class="meta">Concluído · +40 XP</div></div></div>
+              <div class="path-item current"><div class="node">4</div><div class="card" onclick="goTo('screen-lesson')"><div class="name">Lei dos Senos</div><div class="meta">Em andamento · 68%</div></div></div>
+              <div class="path-item locked"><div class="node">🔒</div><div class="card"><div class="name">Lei dos Cossenos</div><div class="meta">Bloqueado</div></div></div>
+              <div class="path-item locked"><div class="node">🔒</div><div class="card"><div class="name">Aplicações no ENEM</div><div class="meta">Bloqueado</div></div></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="item" onclick="goTo('screen-home')"><div class="dot"></div>Início</div>
+            <div class="item active" onclick="goTo('screen-path')"><div class="dot"></div>Trilhas</div>
+            <div class="item" onclick="goTo('screen-progress')"><div class="dot"></div>Progresso</div>
+            <div class="item" onclick="goTo('screen-chat')"><div class="dot"></div>IA</div>
+            <div class="item" onclick="goTo('screen-profile')"><div class="dot"></div>Perfil</div>
+          </div>
+        </div>
+
+        <!-- ============ LESSON ============ -->
+        <div class="screen" id="screen-lesson">
+          <div class="screen-body">
+            <h2 class="h-serif">Lei dos Senos</h2>
+            <div class="muted" style="margin-bottom:12px;">Trigonometria · Módulo 4</div>
+            <div class="video-box"><div class="play-btn">▶</div></div>
+            <div class="tab-pill-row">
+              <button class="active" onclick="setLessonTab(this,'video')">Vídeo</button>
+              <button onclick="setLessonTab(this,'notas')">Notas</button>
+              <button onclick="setLessonTab(this,'recursos')">Recursos</button>
+            </div>
+            <div id="lessonTabContent">
+              <div class="lesson-idx-item"><span class="time">00:00</span><span>Introdução ao problema</span></div>
+              <div class="lesson-idx-item"><span class="time">02:15</span><span>Demonstração da fórmula</span></div>
+              <div class="lesson-idx-item"><span class="time">05:40</span><span>Exemplo resolvido</span></div>
+              <div class="lesson-idx-item"><span class="time">08:20</span><span>Erros comuns</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ EXERCISES ============ -->
+        <div class="screen" id="screen-exercises">
+          <div class="screen-body" id="exBody"></div>
+        </div>
+
+        <!-- ============ SPEED QUIZ ============ -->
+        <div class="screen" id="screen-quiz">
+          <div class="screen-body" style="position:relative;">
+            <div class="combo-badge" id="comboBadge">+50 XP COMBO!</div>
+            <div class="timer-track"><div class="timer-fill" id="quizTimerFill"></div></div>
+            <div class="quiz-topline"><span class="quiz-score">🔥 <span id="quizScore">0</span> pts</span><span class="muted" id="quizCount">1/5</span></div>
+            <div id="quizBody"></div>
+          </div>
+        </div>
+
+        <!-- ============ PROGRESS ============ -->
+        <div class="screen" id="screen-progress">
+          <div class="screen-body">
+            <h2 class="h-serif">Seu Progresso</h2>
+            <div class="xp-bar-track" style="margin:10px 0 4px;"><div class="xp-bar-fill" style="width:62%;"></div></div>
+            <div class="muted">Nível 7 → 620 XP para o Nível 8</div>
+            <div class="stat-trio" style="margin-top:16px;">
+              <div class="card stat-tile"><div class="num">12</div><div class="lbl">Sequência</div></div>
+              <div class="card stat-tile"><div class="num">86</div><div class="lbl">Aulas</div></div>
+              <div class="card stat-tile"><div class="num">91%</div><div class="lbl">Precisão</div></div>
+            </div>
+            <div class="section-title">ATIVIDADE SEMANAL</div>
+            <div class="heatmap" id="heatmap"></div>
+            <div class="section-title">DOMÍNIO POR MATÉRIA</div>
+            <div class="mastery-row"><div class="mtop"><span>Matemática</span><span>80%</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:80%;"></div></div></div>
+            <div class="mastery-row"><div class="mtop"><span>Português</span><span>65%</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:65%;"></div></div></div>
+            <div class="section-title">CONQUISTAS</div>
+            <div class="ach-grid">
+              <div class="ach earned">🏆</div><div class="ach earned">🔥</div><div class="ach earned">📚</div><div class="ach locked">🎯</div>
+              <div class="ach earned">⚡</div><div class="ach locked">🧠</div><div class="ach locked">🌟</div><div class="ach locked">👑</div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="item" onclick="goTo('screen-home')"><div class="dot"></div>Início</div>
+            <div class="item" onclick="goTo('screen-path')"><div class="dot"></div>Trilhas</div>
+            <div class="item active" onclick="goTo('screen-progress')"><div class="dot"></div>Progresso</div>
+            <div class="item" onclick="goTo('screen-chat')"><div class="dot"></div>IA</div>
+            <div class="item" onclick="goTo('screen-profile')"><div class="dot"></div>Perfil</div>
+          </div>
+        </div>
+
+        <!-- ============ MOCK EXAM ============ -->
+        <div class="screen" id="screen-exam">
+          <div class="screen-body">
+            <div class="exam-timer"><span class="muted">Tempo restante</span><span class="t" id="examTimer">04:58:32</span></div>
+            <div class="nav-grid" id="examGrid"></div>
+            <div class="q-text">Um terreno retangular tem 40 m de perímetro. Se a largura é 2/3 do comprimento, qual é a área do terreno?</div>
+            <div class="option" onclick="selectExamOption(this)"><div class="letter">A</div>48 m²</div>
+            <div class="option" onclick="selectExamOption(this)"><div class="letter">B</div>72 m²</div>
+            <div class="option" onclick="selectExamOption(this)"><div class="letter">C</div>96 m²</div>
+            <div class="option" onclick="selectExamOption(this)"><div class="letter">D</div>108 m²</div>
+            <div class="option" onclick="selectExamOption(this)"><div class="letter">E</div>120 m²</div>
+            <div class="hairline"></div>
+            <div class="section-title">RESULTADO POR ÁREA (simulado anterior)</div>
+            <div class="area-row"><div class="atop"><span>Matemática</span><span>7/10</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:70%;"></div></div></div>
+            <div class="area-row"><div class="atop"><span>Linguagens</span><span>8/10</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:80%;"></div></div></div>
+            <div class="area-row"><div class="atop"><span>Humanas</span><span>6/10</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:60%;"></div></div></div>
+            <div class="area-row"><div class="atop"><span>Natureza</span><span>5/10</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:50%;"></div></div></div>
+          </div>
+        </div>
+
+        <!-- ============ AI CHAT ============ -->
+        <div class="screen" id="screen-chat">
+          <div class="screen-body">
+            <h2 class="h-serif" style="margin-bottom:12px;">Assistente INQUIRA</h2>
+            <div class="chat-scroll" id="chatScroll">
+              <div class="bubble user">Como eu resolvo essa questão de Lei dos Senos?</div>
+              <div class="bubble ai">Antes de te dar a fórmula: você já identificou quais lados e ângulos o problema te dá? Isso decide qual caso da Lei dos Senos usar.</div>
+              <div class="bubble user">Dei um ângulo e o lado oposto, e outro ângulo.</div>
+              <div class="bubble ai">Ótimo, esse é o caso clássico ângulo-lado-ângulo. Tente montar a proporção a/sen(A) = b/sen(B) com o que você já tem — o que fica dos dois lados da igualdade?</div>
+            </div>
+            <div class="chip-row">
+              <button class="chip" onclick="chatQuick('dica')">Dica</button>
+              <button class="chip" onclick="chatQuick('resolucao')">Ver resolução</button>
+            </div>
+          </div>
+          <div class="chat-input-row" style="padding:0 18px 16px;">
+            <input type="text" id="chatInput" placeholder="Digite sua dúvida..." oninput="checkChatInput()">
+            <button class="send-btn" id="sendBtn" onclick="sendChat()">➤</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<script>
+const screens = [
+  {id:'screen-login', label:'Login'},
+  {id:'screen-home', label:'Home'},
+  {id:'screen-profile', label:'Perfil'},
+  {id:'screen-path', label:'Trilha'},
+  {id:'screen-lesson', label:'Aula'},
+  {id:'screen-exercises', label:'Exercícios'},
+  {id:'screen-quiz', label:'Speed Quiz'},
+  {id:'screen-progress', label:'Progresso'},
+  {id:'screen-exam', label:'Simulado'},
+  {id:'screen-chat', label:'Chat IA'}
+];
+let current = 0;
+
+const pillTrack = document.getElementById('pillTrack');
+screens.forEach((s,i)=>{
+  const b = document.createElement('button');
+  b.className = 'pill' + (i===0?' active':'');
+  b.textContent = s.label;
+  b.onclick = ()=>goTo(s.id);
+  pillTrack.appendChild(b);
+});
+document.getElementById('screenTotal').textContent = screens.length;
+
+function goTo(id){
+  const idx = screens.findIndex(s=>s.id===id);
+  if(idx===-1) return;
+  current = idx;
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.pill').forEach((el,i)=>el.classList.toggle('active', i===idx));
+  document.getElementById('screenTitle').textContent = screens[idx].label;
+  document.getElementById('screenIndex').textContent = idx+1;
+  if(id==='screen-exercises') initExercises();
+  if(id==='screen-quiz') initQuiz();
+  if(id==='screen-progress') initHeatmap();
+  if(id==='screen-exam') initExamGrid();
+}
+function prevScreen(){ goTo(screens[(current-1+screens.length)%screens.length].id); }
+function nextScreen(){ goTo(screens[(current+1)%screens.length].id); }
+
+/* LOGIN */
+function setLoginMode(mode){
+  const isLogin = mode==='login';
+  document.getElementById('loginModeBtn').classList.toggle('active', isLogin);
+  document.getElementById('signupModeBtn').classList.toggle('active', !isLogin);
+  document.getElementById('nameField').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('loginSubmitBtn').textContent = isLogin ? 'Entrar' : 'Criar conta';
+}
+
+/* LESSON TABS */
+const lessonTabs = {
+  video: `<div class="lesson-idx-item"><span class="time">00:00</span><span>Introdução ao problema</span></div>
+          <div class="lesson-idx-item"><span class="time">02:15</span><span>Demonstração da fórmula</span></div>
+          <div class="lesson-idx-item"><span class="time">05:40</span><span>Exemplo resolvido</span></div>
+          <div class="lesson-idx-item"><span class="time">08:20</span><span>Erros comuns</span></div>`,
+  notas: `<div class="card" style="font-size:12.5px;line-height:1.6;">A Lei dos Senos relaciona os lados de um triângulo aos senos de seus ângulos opostos: a/sen(A) = b/sen(B) = c/sen(C). Use quando souber um par lado-ângulo opostos completo.</div>`,
+  recursos: `<div class="resource-item">📄 Resumo — Lei dos Senos.pdf</div>
+             <div class="resource-item">📄 Lista de exercícios extra.pdf</div>
+             <div class="resource-item">📄 Fórmulas de Trigonometria.pdf</div>`
+};
+function setLessonTab(btn, tab){
+  document.querySelectorAll('#screen-lesson .tab-pill-row button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('lessonTabContent').innerHTML = lessonTabs[tab];
+}
+
+/* EXERCISES */
+const exQuestions = [
+  {q:"Qual é o valor de sen(30°)?", opts:["0","1/2","√2/2","√3/2"], correct:1, exp:"sen(30°) = 1/2 é um valor notável da trigonometria, usado com frequência em problemas de ângulos especiais."},
+  {q:"Em um triângulo retângulo, qual razão trigonométrica é cateto oposto sobre hipotenusa?", opts:["Cosseno","Tangente","Seno","Cotangente"], correct:2, exp:"Seno é definido como cateto oposto dividido pela hipotenusa (SOH da regra SOH-CAH-TOA)."},
+  {q:"Se um ângulo mede 45°, qual é o valor da tangente desse ângulo?", opts:["0","1","√3","1/2"], correct:1, exp:"tan(45°) = 1, porque nesse ângulo o cateto oposto e o cateto adjacente têm o mesmo comprimento."}
+];
+let exIndex = 0, exScore = 0, exSelected = null, exAnswered = false;
+
+function initExercises(){
+  exIndex = 0; exScore = 0;
+  renderExercise();
+}
+function renderExercise(){
+  exSelected = null; exAnswered = false;
+  const body = document.getElementById('exBody');
+  if(exIndex >= exQuestions.length){
+    body.innerHTML = `<div class="results-box"><div class="muted">CONCLUÍDO</div><div class="big">+${exScore} XP</div><div class="muted" style="margin-top:6px;">${exQuestions.length} de ${exQuestions.length} questões respondidas</div><button class="btn-gold" style="margin-top:22px;" onclick="initExercises()">Refazer</button></div>`;
+    return;
+  }
+  const item = exQuestions[exIndex];
+  const letters = ['A','B','C','D'];
+  body.innerHTML = `
+    <div class="q-progress">Questão ${exIndex+1} de ${exQuestions.length}</div>
+    <div class="q-text">${item.q}</div>
+    <div id="exOptions">
+      ${item.opts.map((o,i)=>`<div class="option" data-i="${i}" onclick="selectExOption(${i})"><div class="letter">${letters[i]}</div>${o}</div>`).join('')}
+    </div>
+    <div id="exExplain"></div>
+    <button class="btn-gold" id="exActionBtn" style="margin-top:8px;" onclick="exAction()" disabled>Confirmar</button>
+  `;
+}
+function selectExOption(i){
+  if(exAnswered) return;
+  exSelected = i;
+  document.querySelectorAll('#exOptions .option').forEach((el,idx)=>el.classList.toggle('selected', idx===i));
+  document.getElementById('exActionBtn').disabled = false;
+}
+function exAction(){
+  if(!exAnswered){
+    exAnswered = true;
+    const item = exQuestions[exIndex];
+    document.querySelectorAll('#exOptions .option').forEach((el,idx)=>{
+      if(idx===item.correct) el.classList.add('correct');
+      else if(idx===exSelected) el.classList.add('incorrect');
+    });
+    if(exSelected===item.correct) exScore += 30;
+    document.getElementById('exExplain').innerHTML = `<div class="explain-box">${item.exp}</div>`;
+    document.getElementById('exActionBtn').textContent = exIndex < exQuestions.length-1 ? 'Próxima' : 'Ver resultado';
+  } else {
+    exIndex++;
+    renderExercise();
+  }
+}
+
+/* SPEED QUIZ */
+const quizQuestions = [
+  {q:"7 × 8 = ?", opts:["54","56","63"], correct:1},
+  {q:"Capital da França?", opts:["Lyon","Marselha","Paris"], correct:2},
+  {q:"H2O é a fórmula de:", opts:["Água","Sal","Gás carbônico"], correct:0},
+  {q:"Antônimo de 'ágil':", opts:["Rápido","Lento","Esperto"], correct:1},
+  {q:"Raiz quadrada de 81:", opts:["8","9","7"], correct:1}
+];
+let quizIndex=0, quizScore=0, quizStreak=0, quizTimer=null, quizTimeLeft=0;
+function initQuiz(){
+  quizIndex=0; quizScore=0; quizStreak=0;
+  document.getElementById('quizScore').textContent = 0;
+  renderQuizQuestion();
+}
+function renderQuizQuestion(){
+  clearInterval(quizTimer);
+  if(quizIndex >= quizQuestions.length){
+    document.getElementById('quizBody').innerHTML = `<div class="results-box"><div class="muted">SPEED QUIZ FINALIZADO</div><div class="big">${quizScore} pts</div><button class="btn-gold" style="margin-top:22px;" onclick="initQuiz()">Jogar novamente</button></div>`;
+    document.getElementById('quizCount').textContent = `${quizQuestions.length}/${quizQuestions.length}`;
+    return;
+  }
+  const item = quizQuestions[quizIndex];
+  const letters=['A','B','C'];
+  document.getElementById('quizCount').textContent = `${quizIndex+1}/${quizQuestions.length}`;
+  document.getElementById('quizBody').innerHTML = `
+    <div class="q-text">${item.q}</div>
+    ${item.opts.map((o,i)=>`<div class="option" onclick="answerQuiz(${i})"><div class="letter">${letters[i]}</div>${o}</div>`).join('')}
+  `;
+  quizTimeLeft = 100;
+  const fill = document.getElementById('quizTimerFill');
+  fill.style.width = '100%'; fill.style.background = 'var(--gold)';
+  quizTimer = setInterval(()=>{
+    quizTimeLeft -= 2;
+    fill.style.width = quizTimeLeft+'%';
+    if(quizTimeLeft < 55) fill.style.background = '#D98C27';
+    if(quizTimeLeft < 25) fill.style.background = 'var(--danger)';
+    if(quizTimeLeft <= 0){ clearInterval(quizTimer); quizIndex++; renderQuizQuestion(); }
+  }, 60);
+}
+function answerQuiz(i){
+  clearInterval(quizTimer);
+  const item = quizQuestions[quizIndex];
+  if(i===item.correct){
+    quizScore += 20;
+    quizStreak++;
+    document.getElementById('quizScore').textContent = quizScore;
+    if(quizStreak>=2){
+      const badge = document.getElementById('comboBadge');
+      badge.classList.add('show');
+      quizScore += 50;
+      document.getElementById('quizScore').textContent = quizScore;
+      setTimeout(()=>badge.classList.remove('show'), 700);
+    }
+  } else { quizStreak = 0; }
+  quizIndex++;
+  setTimeout(renderQuizQuestion, 450);
+}
+
+/* PROGRESS HEATMAP */
+function initHeatmap(){
+  const grid = document.getElementById('heatmap');
+  if(grid.children.length) return;
+  const intensities = [0.15,0.9,0.3,0.6,0.95,0.1,0.4, 0.5,0.2,0.8,0.9,0.3,0.15,0.6, 0.7,0.4,0.9,0.2,0.5,0.85,0.1];
+  grid.innerHTML = intensities.map(v=>`<div class="heat-cell" style="background:rgba(201,162,39,${v});"></div>`).join('');
+}
+
+/* MOCK EXAM */
+function initExamGrid(){
+  const grid = document.getElementById('examGrid');
+  if(grid.children.length) return;
+  for(let i=1;i<=16;i++){
+    const answered = i<=9;
+    grid.innerHTML += `<div class="n ${answered?'answered':''}" onclick="this.classList.toggle('answered')">${i}</div>`;
+  }
+  let h=4,m=58,s=32;
+  setInterval(()=>{
+    if(s>0) s--; else { s=59; if(m>0) m--; else { m=59; if(h>0) h--; } }
+    document.getElementById('examTimer').textContent =
+      String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }, 1000);
+}
+function selectExamOption(el){
+  document.querySelectorAll('#screen-exam .option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+/* AI CHAT */
+function checkChatInput(){
+  const val = document.getElementById('chatInput').value.trim();
+  document.getElementById('sendBtn').classList.toggle('ready', val.length>0);
+}
+function sendChat(){
+  const input = document.getElementById('chatInput');
+  const val = input.value.trim();
+  if(!val) return;
+  const scroll = document.getElementById('chatScroll');
+  scroll.innerHTML += `<div class="bubble user">${val}</div>`;
+  input.value=''; checkChatInput();
+  scroll.innerHTML += `<div class="typing" id="typingNow"><span></span><span></span><span></span></div>`;
+  scroll.scrollTop = scroll.scrollHeight;
+  setTimeout(()=>{
+    document.getElementById('typingNow').remove();
+    scroll.innerHTML += `<div class="bubble ai">Boa pergunta. Antes de eu te explicar direto, o que você já tentou até agora? Assim consigo te ajudar no ponto exato onde travou.</div>`;
+    scroll.scrollTop = scroll.scrollHeight;
+  }, 1100);
+}
+function chatQuick(type){
+  const scroll = document.getElementById('chatScroll');
+  const msg = type==='dica'
+    ? "Dica: reescreva a proporção da Lei dos Senos substituindo só os valores que você já tem. O que sobra pra descobrir?"
+    : "Resolução: a/sen(A) = b/sen(B) → substitua os valores conhecidos e isole o lado desconhecido. Quer que eu mostre o primeiro passo?";
+  scroll.innerHTML += `<div class="bubble ai">${msg}</div>`;
+  scroll.scrollTop = scroll.scrollHeight;
+}
+</script>
+</body>
+</html>
