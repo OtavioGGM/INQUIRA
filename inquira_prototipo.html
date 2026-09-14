@@ -48,16 +48,45 @@
   /* Classe reutilizável do logo — usada em todos os pontos abaixo.
      Ela lê --logo-url, então não precisa mexer aqui, só na variável acima. */
   .logo-mark{
-    background-image: var(--logo-url);
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
+    position:relative;
     display:inline-block;
-    border-radius: 80px;   /* ← arredondamento leve, novo */
   }
-  .logo-mark.on-light{
-    background-image: var(--logo-url-light-bg);
+  .logo-mark::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:50%;
+    height:100%;
+    aspect-ratio:1;
+    transform:translateX(-50%);
+    background-image:var(--logo-url);
+    background-size:contain;
+    background-position:center;
+    background-repeat:no-repeat;
+    border-radius:25%;
   }
+  .logo-mark.on-light::before{
+    background-image:var(--logo-url-light-bg);
+  }
+  .stage-logo-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    margin-bottom:8px;
+  }
+  .stage-logo-name,
+  .phone-logo-name{
+    font-family:var(--serif);
+    font-weight:700;
+    letter-spacing:3px;
+    background:linear-gradient(105deg,var(--gold-deep),var(--gold-soft),var(--gold));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  
+  }
+  .stage-logo-name{font-size:30px;}
 
   .stage-header{
     max-width:920px;
@@ -75,7 +104,7 @@
     font-family:var(--serif);
     font-size:26px;
     font-weight:400;
-    margin:0 0 4px;
+    margin:150 0 4px;
     color:var(--ink);
   }
   .stage-header p{
@@ -271,12 +300,13 @@
 
   /* ===================== LOGIN ===================== */
   #screen-login .screen-body{
-    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    display:flex;flex-direction:column;justify-content:flex-start;align-items:center;
     text-align:center;
     padding:20px 26px;
   }
-  .wordmark-row{display:flex;align-items:center;gap:14px;margin-bottom:34px;}
+  .wordmark-row{display:flex;align-items:center;gap:4px;margin-bottom:10px;}
   .wordmark-row .rule{width:34px;height:1px;background:var(--gold);}
+  .phone-logo-name{font-size:22px;line-height:1;margin-bottom:26px;}
   .wordmark{font-family:var(--serif);font-size:30px;letter-spacing:3px;color:var(--paper);}
   .mode-toggle{
     display:flex;width:100%;background:var(--ink-2);border-radius:10px;padding:4px;margin-bottom:26px;
@@ -464,7 +494,7 @@
 
   <div class="stage-header">
 <!-- painel externo -->
-<div class="logo-mark on-light" ... style="width:170px;height:52px;margin:0 auto 8px;"></div>
+<div class="stage-logo-row"><div class="logo-mark on-light" ... style="width:76px;height:76px;"></div><div class="stage-logo-name">INQUIRA</div></div>
     <h1 id="screenTitle">Login / Cadastro</h1>
     <p>Protótipo de apresentação — clique nas telas abaixo ou use as setas</p>
   </div>
@@ -491,7 +521,8 @@
         <div class="screen active" id="screen-login">
           <div class="screen-body">
             <!-- LOGO (dentro do app, tela de Login): ponto mais nobre para o logo -->
-            <div class="wordmark-row"><div class="rule"></div><div class="logo-mark" ... style="width:190px;height:56px;"></div><div class="rule"></div></div>
+            <div class="wordmark-row"><div class="rule"></div><div class="logo-mark" ... style="width:204px;height:64px;"></div><div class="rule"></div></div>
+            <div class="phone-logo-name">INQUIRA</div>
             <div class="mode-toggle">
               <button class="active" id="loginModeBtn" onclick="setLoginMode('login')">Entrar</button>
               <button id="signupModeBtn" onclick="setLoginMode('signup')">Cadastrar</button>
