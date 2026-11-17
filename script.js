@@ -244,3 +244,21 @@ function chatQuick(type){
 }
 
 renderNotes('screen-login');
+
+/* Relógio em tempo real na barra de status do celular */
+function iniciarRelogioCelular() {
+  const clockEl = document.getElementById('status-clock');
+  if (!clockEl) return;
+
+  function atualizar() {
+    const agora = new Date();
+    // Formata para exibir apenas Hora:Minuto (ex: 14:32)
+    clockEl.textContent = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  atualizar();
+  setInterval(atualizar, 60000); // Atualiza a cada 1 minuto
+}
+
+// Executa a função assim que o script carregar
+iniciarRelogioCelular();
