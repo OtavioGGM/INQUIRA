@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INQUIRA — Protótipo de Apresentação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- LOGO (aba do navegador): troque o href pelo mesmo arquivo/base64 usado em --logo-url -->
+<link rel="icon" type="image/png" href="logo-inquira.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== BARRA SUPERIOR: [logo] título+subtítulo | < seções > | Tela n de N ===== -->
+  <header class="topbar">
+    <div class="stage-logo-row"><div class="logo-mark on-light" style="width:44px;height:44px;"></div><div class="stage-logo-name">INQUIRA</div></div>
+    <div class="stage-header">
+      <h1 id="screenTitle">Login / Cadastro</h1>
+      <p>Protótipo de apresentação — navegue pelas seções ou use as setas</p>
+    </div>
+    <div class="controls">
+      <button class="nav-arrow" onclick="prevScreen()">‹</button>
+      <div class="pill-track" id="pillTrack"></div>
+      <button class="nav-arrow" onclick="nextScreen()">›</button>
+    </div>
+    <div class="stage-note">Tela <span id="screenIndex">1</span> de <span id="screenTotal">10</span></div>
+  </header>
+
+  <div class="stage">
+
+    <!-- ===== COLUNA ESQUERDA: celular ===== -->
+    <div class="stage-left">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <span class="bars"><span></span><span></span><span></span><span></span></span>
+              <span class="battery"></span>
+            </span>
+          </div>
+
+          <!-- ============ LOGIN ============ -->
+          <div class="screen active" id="screen-login">
+            <div class="screen-body">
+              <!-- LOGO (dentro do app, tela de Login): ponto mais nobre para o logo -->
+              <div class="wordmark-row"><div class="rule"></div><div class="logo-mark" ... style="width:204px;height:64px;"></div><div class="rule"></div></div>
+              <div class="phone-logo-name">INQUIRA</div>
+              <div class="mode-toggle">
+                <button class="active" id="loginModeBtn" onclick="setLoginMode('login')">Entrar</button>
+                <button id="signupModeBtn" onclick="setLoginMode('signup')">Cadastrar</button>
+              </div>
+              <div class="field" id="nameField" style="display:none;">
+                <label>Nome</label>
+                <input type="text" placeholder="Como podemos te chamar?">
+              </div>
+              <div class="field">
+                <label>E-mail</label>
+                <input type="email" placeholder="voce@email.com">
+              </div>
+              <div class="field">
+                <label>Senha</label>
+                <input type="password" placeholder="••••••••">
+              </div>
+              <button class="btn-gold" id="loginSubmitBtn" style="margin-top:6px;">Entrar</button>
+              <div class="login-footnote"><span>Esqueci minha senha</span></div>
+            </div>
+          </div>
+
+          <!-- ============ HOME ============ -->
+          <div class="screen" id="screen-home">
+            <div class="screen-body">
+              <div class="greet-row">
+                <div>
+                  <div class="muted">Boa tarde</div>
+                  <h2 class="h-serif">Barbara</h2>
+                </div>
+                <div class="avatar">BK</div>
+              </div>
+              <div class="card" style="margin-bottom:16px;">
+                <div class="xp-strip"><span class="lvl">Nível 7 · Estudiosa</span><span class="muted">2.480 XP</span></div>
+                <div class="xp-bar-track"><div class="xp-bar-fill" style="width:62%;"></div></div>
+              </div>
+              <div class="card continue-card" onclick="goTo('screen-path')" style="cursor:pointer;">
+                <div class="top"><span class="tag">CONTINUAR ESTUDANDO</span><span class="tag">68%</span></div>
+                <div class="h-serif" style="font-size:15px;">Trigonometria</div>
+                <div class="xp-bar-track" style="margin-top:8px;"><div class="xp-bar-fill" style="width:68%;"></div></div>
+              </div>
+              <div class="section-title">TRILHAS</div>
+              <div class="subject-row">
+                <div class="subject-chip"><div class="ic">∑</div>Matemática</div>
+                <div class="subject-chip"><div class="ic">✎</div>Português</div>
+                <div class="subject-chip"><div class="ic">⚛</div>Física</div>
+                <div class="subject-chip"><div class="ic">⚗</div>Química</div>
+                <div class="subject-chip"><div class="ic">🌍</div>Geografia</div>
+              </div>
+              <div class="tiles-row">
+                <div class="tile" onclick="goTo('screen-exam')"><div class="ic">⏱</div><div class="lbl">Simulado</div></div>
+              </div>
+            </div>
+            <div class="bottom-nav">
+              <div class="item active" onclick="goTo('screen-home')"><div class="dot"></div>Início</div>
+              <div class="item" onclick="goTo('screen-path')"><div class="dot"></div>Trilhas</div>
+              <div class="item" onclick="goTo('screen-chat')"><div class="dot"></div>IA</div>
+              <div class="item" onclick="goTo('screen-profile')"><div class="dot"></div>Perfil</div>
+            </div>
+          </div>
+
+          <!-- ============ PROFILE ============ -->
+          <div class="screen" id="screen-profile">
+            <div class="screen-body">
+              <div class="profile-head">
+                <div class="avatar lg">BK</div>
+                <h2 class="h-serif" style="margin-top:10px;">Barbara Karolinny</h2>
+                <div class="badge-pill">🏅 Estudiosa Nível 7</div>
+              </div>
+              <div class="stat-trio">
+                <div class="card stat-tile"><div class="num">2.480</div><div class="lbl">XP total</div></div>
+                <div class="card stat-tile"><div class="num">12</div><div class="lbl">Sequência</div></div>
+                <div class="card stat-tile"><div class="num">#34</div><div class="lbl">Ranking</div></div>
+              </div>
+              <div class="xp-bar-track"><div class="xp-bar-fill" style="width:62%;"></div></div>
+              <div class="muted" style="margin-top:5px;">620 XP para o Nível 8</div>
+
+              <div class="section-title">CONQUISTAS</div>
+              <div class="ach-grid">
+                <div class="ach earned">🏆</div><div class="ach earned">🔥</div><div class="ach earned">📚</div><div class="ach locked">🎯</div>
+                <div class="ach earned">⚡</div><div class="ach locked">🧠</div><div class="ach locked">🌟</div><div class="ach locked">👑</div>
+              </div>
+
+              <div class="section-title">DOMÍNIO POR MATÉRIA</div>
+              <div class="mastery-row"><div class="mtop"><span>Matemática</span><span>80%</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:80%;"></div></div></div>
+              <div class="mastery-row"><div class="mtop"><span>Português</span><span>65%</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:65%;"></div></div></div>
+              <div class="mastery-row"><div class="mtop"><span>Física</span><span>44%</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:44%;"></div></div></div>
+
+              <div class="section-title">ATIVIDADE RECENTE</div>
+              <div class="activity-item"><span>Concluiu: Lei dos Senos</span><span class="plus">+50</span></div>
+              <div class="activity-item"><span>Simulado ENEM #3</span><span class="plus">+210</span></div>
+            </div>
+            <div class="bottom-nav">
+              <div class="item" onclick="goTo('screen-home')"><div class="dot"></div>Início</div>
+              <div class="item" onclick="goTo('screen-path')"><div class="dot"></div>Trilhas</div>
+              <div class="item" onclick="goTo('screen-chat')"><div class="dot"></div>IA</div>
+              <div class="item active" onclick="goTo('screen-profile')"><div class="dot"></div>Perfil</div>
+            </div>
+          </div>
+
+          <!-- ============ LEARNING PATH ============ -->
+          <div class="screen" id="screen-path">
+            <div class="screen-body">
+              <h2 class="h-serif">Trilha: Trigonometria</h2>
+              <div class="muted" style="margin-bottom:14px;">4 de 6 módulos concluídos</div>
+              <div class="path-list">
+                <div class="path-item done"><div class="node">✓</div><div class="card"><div class="name">Ângulos e Triângulos</div><div class="meta">Concluído · +40 XP</div></div></div>
+                <div class="path-item done"><div class="node">✓</div><div class="card"><div class="name">Seno e Cosseno</div><div class="meta">Concluído · +40 XP</div></div></div>
+                <div class="path-item done"><div class="node">✓</div><div class="card"><div class="name">Tangente</div><div class="meta">Concluído · +40 XP</div></div></div>
+                <div class="path-item current"><div class="node">4</div><div class="card" onclick="goTo('screen-lesson')"><div class="name">Lei dos Senos</div><div class="meta">Em andamento · 68%</div></div></div>
+                <div class="path-item locked"><div class="node">🔒</div><div class="card"><div class="name">Lei dos Cossenos</div><div class="meta">Bloqueado</div></div></div>
+                <div class="path-item locked"><div class="node">🔒</div><div class="card"><div class="name">Aplicações no ENEM</div><div class="meta">Bloqueado</div></div></div>
+              </div>
+            </div>
+            <div class="bottom-nav">
+              <div class="item" onclick="goTo('screen-home')"><div class="dot"></div>Início</div>
+              <div class="item active" onclick="goTo('screen-path')"><div class="dot"></div>Trilhas</div>
+              <div class="item" onclick="goTo('screen-chat')"><div class="dot"></div>IA</div>
+              <div class="item" onclick="goTo('screen-profile')"><div class="dot"></div>Perfil</div>
+            </div>
+          </div>
+
+          <!-- ============ LESSON ============ -->
+          <div class="screen" id="screen-lesson">
+            <div class="screen-body">
+              <h2 class="h-serif">Lei dos Senos</h2>
+              <div class="muted" style="margin-bottom:12px;">Trigonometria · Módulo 4</div>
+              <div class="video-box"><div class="play-btn">▶</div></div>
+              <div class="tab-pill-row">
+                <button class="active" onclick="setLessonTab(this,'video')">Vídeo</button>
+                <button onclick="setLessonTab(this,'notas')">Notas</button>
+                <button onclick="setLessonTab(this,'recursos')">Recursos</button>
+              </div>
+              <div id="lessonTabContent">
+                <div class="lesson-idx-item"><span class="time">00:00</span><span>Introdução ao problema</span></div>
+                <div class="lesson-idx-item"><span class="time">02:15</span><span>Demonstração da fórmula</span></div>
+                <div class="lesson-idx-item"><span class="time">05:40</span><span>Exemplo resolvido</span></div>
+                <div class="lesson-idx-item"><span class="time">08:20</span><span>Erros comuns</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============ EXERCISES ============ -->
+          <div class="screen" id="screen-exercises">
+            <div class="screen-body" id="exBody"></div>
+          </div>
+
+          <!-- ============ MOCK EXAM ============ -->
+          <div class="screen" id="screen-exam">
+            <div class="screen-body">
+              <div class="exam-timer"><span class="muted">Tempo restante</span><span class="t" id="examTimer">04:58:32</span></div>
+              <div class="nav-grid" id="examGrid"></div>
+              <div class="q-text">Um terreno retangular tem 40 m de perímetro. Se a largura é 2/3 do comprimento, qual é a área do terreno?</div>
+              <div class="option" onclick="selectExamOption(this)"><div class="letter">A</div>48 m²</div>
+              <div class="option" onclick="selectExamOption(this)"><div class="letter">B</div>72 m²</div>
+              <div class="option" onclick="selectExamOption(this)"><div class="letter">C</div>96 m²</div>
+              <div class="option" onclick="selectExamOption(this)"><div class="letter">D</div>108 m²</div>
+              <div class="option" onclick="selectExamOption(this)"><div class="letter">E</div>120 m²</div>
+              <div class="hairline"></div>
+              <div class="section-title">RESULTADO POR ÁREA (simulado anterior)</div>
+              <div class="area-row"><div class="atop"><span>Matemática</span><span>7/10</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:70%;"></div></div></div>
+              <div class="area-row"><div class="atop"><span>Linguagens</span><span>8/10</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:80%;"></div></div></div>
+              <div class="area-row"><div class="atop"><span>Humanas</span><span>6/10</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:60%;"></div></div></div>
+              <div class="area-row"><div class="atop"><span>Natureza</span><span>5/10</span></div><div class="xp-bar-track"><div class="xp-bar-fill" style="width:50%;"></div></div></div>
+            </div>
+          </div>
+
+          <!-- ============ AI CHAT ============ -->
+          <div class="screen" id="screen-chat">
+            <div class="screen-body">
+              <h2 class="h-serif" style="margin-bottom:12px;">Assistente INQUIRA</h2>
+              <div class="chat-scroll" id="chatScroll">
+                <div class="bubble user">Como eu resolvo essa questão de Lei dos Senos?</div>
+                <div class="bubble ai">Antes de te dar a fórmula: você já identificou quais lados e ângulos o problema te dá? Isso decide qual caso da Lei dos Senos usar.</div>
+                <div class="bubble user">Dei um ângulo e o lado oposto, e outro ângulo.</div>
+                <div class="bubble ai">Ótimo, esse é o caso clássico ângulo-lado-ângulo. Tente montar a proporção a/sen(A) = b/sen(B) com o que você já tem — o que fica dos dois lados da igualdade?</div>
+              </div>
+              <div class="chip-row">
+                <button class="chip" onclick="chatQuick('dica')">Dica</button>
+                <button class="chip" onclick="chatQuick('resolucao')">Ver resolução</button>
+              </div>
+            </div>
+            <div class="chat-input-row" style="padding:0 18px 16px;">
+              <input type="text" id="chatInput" placeholder="Digite sua dúvida..." oninput="checkChatInput()">
+              <button class="send-btn" id="sendBtn" onclick="sendChat()">➤</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    </div>
+
+    <!-- ===== COLUNA DIREITA: balões de apoio ===== -->
+    <div class="stage-right">
+      <!-- Textos dos balões: edite em "notes" no script.js (ou clique no texto e digite ao vivo) -->
+      <div class="balloons">
+        <section class="balloon mvp" id="balloonMvp">
+          <div class="balloon-tag">MVP · Mágico de Oz</div>
+          <h3 class="balloon-title" contenteditable="true" spellcheck="false" data-side="mvp" data-field="title"></h3>
+          <p class="balloon-text" contenteditable="true" spellcheck="false" data-side="mvp" data-field="text"></p>
+          <div class="balloon-tech" id="techMvp"></div>
+        </section>
+
+        <section class="balloon real" id="balloonReal">
+          <div class="balloon-tag">Plataforma de fato</div>
+          <h3 class="balloon-title" contenteditable="true" spellcheck="false" data-side="real" data-field="title"></h3>
+          <p class="balloon-text" contenteditable="true" spellcheck="false" data-side="real" data-field="text"></p>
+          <div class="balloon-tech" id="techReal"></div>
+        </section>
+      </div>
+    </div>
+
+  </div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
