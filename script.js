@@ -1,13 +1,16 @@
 const screens = [
   {id:'screen-login', label:'Login'},
   {id:'screen-home', label:'Home'},
-  {id:'screen-profile', label:'Perfil'},
   {id:'screen-path', label:'Trilha'},
   {id:'screen-lesson', label:'Aula'},
   {id:'screen-exercises', label:'Exercícios'},
   {id:'screen-exam', label:'Simulado'},
-  {id:'screen-chat', label:'Chat IA'}
+  {id:'screen-chat', label:'Chat IA'},
+  {id:'screen-groups', label:'Grupos'},
+  {id:'screen-profile', label:'Perfil'},
+  {id:'screen-thanks', label:'Agradecimento'}
 ];
+
 let current = 0;
 
 const pillTrack = document.getElementById('pillTrack');
@@ -32,6 +35,7 @@ function goTo(id){
   renderNotes(id);
   if(id==='screen-exercises') initExercises();
   if(id==='screen-exam') initExamGrid();
+  if(id==='screen-groups') initGroups();
 }
 
 /* =========================================================
@@ -48,32 +52,40 @@ const notes = {
     real: {title:'Autenticação segura', text:'O back-end valida e-mail e senha. Senha guardada com hash, nunca em texto puro. Dados protegidos conforme a LGPD.', tech:['API','Banco de dados','Hash de senha']}
   },
   'screen-home': {
-    mvp:  {title:'Dados fixos', text:'Nome, XP, nível e trilhas estão escritos direto no HTML. Os cards só navegam entre telas.', tech:['HTML','JS']},
-    real: {title:'Home personalizada', text:'A tela seria montada com o perfil e o progresso de cada aluno, lidos do banco de dados.', tech:['API','Banco de dados']}
+    mvp:  {title:'Dados fixos', text:'Nome, XP, nível e trilhas estão escritos direto no HTML, e o CSS cuida do visual. O JS só troca de tela quando um atalho é clicado. Nada é lido de um servidor: para mudar um dado, é preciso editar o código.', tech:['HTML','CSS','JS']},
+    real: {title:'Home personalizada', text:'Ao abrir a Home, o front-end pede os dados do aluno à API: uma requisição HTTPS que devolve JSON. O back-end, em Python, consulta o banco de dados relacional (usuários, XP, trilhas) e responde só com o que pertence àquele aluno.', tech:['Python','API REST (JSON)','PostgreSQL','HTTPS']}
   },
   'screen-profile': {
-    mvp:  {title:'Perfil de exemplo', text:'Estatísticas, conquistas e domínio por matéria são valores fixos desenhados com CSS.', tech:['HTML','CSS']},
-    real: {title:'Perfil dinâmico', text:'XP, nível, sequência, ranking e conquistas seriam calculados a partir da atividade real do aluno.', tech:['API','Banco de dados','Regras de gamificação']}
+    mvp:  {title:'Perfil de exemplo', text:'Estatísticas, conquistas e domínio por matéria são valores fixos, escritos no HTML e desenhados com CSS (barras, medalhas). O JS não calcula nada: o XP e o nível mostrados são só texto.', tech:['HTML','CSS','JS']},
+    real: {title:'Perfil dinâmico', text:'XP, nível, sequência e conquistas seriam calculados no servidor por regras de gamificação, e não no navegador, para o aluno não conseguir alterar a própria pontuação. Cada evento (aula, acerto) seria gravado no banco e o perfil, somado a partir dele.', tech:['Python','Regras de gamificação','Banco de dados','API REST']}
   },
   'screen-path': {
-    mvp:  {title:'Trilha estática', text:'Os estados concluído, atual e bloqueado são classes CSS aplicadas à mão.', tech:['HTML','CSS']},
-    real: {title:'Trilha por progresso', text:'Módulos seriam cadastrados no banco e liberados conforme o aluno conclui cada etapa.', tech:['API','Banco de dados']}
+    mvp:  {title:'Trilha estática', text:'Os estados concluído, atual e bloqueado são classes CSS aplicadas à mão em cada módulo do HTML. O JS apenas abre a aula ao clicar. Não existe controle real de quem avançou.', tech:['HTML','CSS','JS']},
+    real: {title:'Trilha por progresso', text:'Trilhas e módulos seriam tabelas do banco, ligadas ao progresso de cada aluno. Ao concluir uma etapa, o back-end registra e libera a próxima. A liberação é checada no servidor, então um módulo bloqueado não abre nem por tentativa direta na API.', tech:['Python','PostgreSQL','Relação entre tabelas','API REST']}
   },
   'screen-lesson': {
-    mvp:  {title:'Aula de demonstração', text:'O vídeo é uma caixa visual. As abas Vídeo, Notas e Recursos trocam o texto com JS.', tech:['HTML','CSS','JS']},
-    real: {title:'Vídeo e materiais reais', text:'Vídeos em serviço de hospedagem de mídia. Notas e PDFs vindos do banco, ligados a cada aula.', tech:['Hospedagem de vídeo','API','Banco de dados']}
+    mvp:  {title:'Aula de demonstração', text:'O vídeo é só uma caixa desenhada com HTML e CSS. As abas Vídeo, Notas e Recursos trocam o texto com JS, a partir de um objeto escrito no próprio script. Nenhum arquivo é carregado.', tech:['HTML','CSS','JS']},
+    real: {title:'Vídeo e materiais reais', text:'Os vídeos ficariam em um serviço de hospedagem de mídia, que entrega o vídeo em partes (streaming) para rodar bem em qualquer conexão. Notas e PDFs ficariam em armazenamento de arquivos; o banco guardaria só o endereço de cada material e a aula a que ele pertence.', tech:['Hospedagem de vídeo','Armazenamento de arquivos','PostgreSQL','API REST']}
   },
   'screen-exercises': {
-    mvp:  {title:'Questões em lista JS', text:'3 questões ficam num array no script. O JS confere a resposta e soma 30 XP por acerto.', tech:['JS (array)','DOM']},
-    real: {title:'Banco de questões', text:'Questões por matéria, tema e dificuldade no banco. XP gravado no perfil a cada resposta.', tech:['API','Banco de dados']}
+    mvp:  {title:'Questões em lista JS', text:'As 3 questões ficam em um array dentro do script. O JS compara a opção clicada com a resposta certa, que está no próprio código, e soma 30 XP por acerto. O HTML e o CSS mostram o feedback verde ou vermelho.', tech:['HTML','CSS','JS']},
+    real: {title:'Banco de questões', text:'Questões por matéria, tema e dificuldade ficariam no banco e seriam buscadas com consultas SQL. A correção seria feita no back-end: o gabarito não vai para o navegador, e o XP ganho é gravado no perfil junto com o registro da resposta.', tech:['Python','SQL','PostgreSQL','API REST']}
   },
   'screen-exam': {
-    mvp:  {title:'Simulado demonstrativo', text:'Cronômetro regressivo em JS, 1 questão de exemplo e grade de questões clicável.', tech:['JS','CSS']},
-    real: {title:'Simulados ENEM', text:'Provas montadas por área. Tempo controlado pelo servidor, correção automática e relatório por área.', tech:['API','Banco de dados','Back-end']}
+    mvp:  {title:'Simulado demonstrativo', text:'O cronômetro regressivo é um contador em JS, que reinicia ao recarregar a página. A grade de questões e a questão de exemplo são HTML e CSS, e o clique só marca a alternativa na tela.', tech:['HTML','CSS','JS']},
+    real: {title:'Simulados ENEM', text:'O servidor guardaria o horário de início da prova, então recarregar a página não reinicia o tempo. Ao final, o back-end corrige automaticamente, compara com o gabarito e monta o relatório de acertos por área, que o aluno poderia usar para decidir o que estudar.', tech:['Python','PostgreSQL','Controle de tempo no servidor','API REST']}
+  },
+  'screen-groups': {
+    mvp:  {title:'Grupos simulados', text:'Os 4 grupos e os comentários são dados de exemplo escritos no script. Entrar, sair, criar, curtir, comentar e denunciar funcionam só na memória do navegador: ao reabrir a tela, tudo volta ao início. O HTML monta a tela, o CSS dá o visual e o JS guarda o estado.', tech:['HTML','CSS','JS']},
+    real: {title:'Comunidade de estudo', text:'Grupos, membros e comentários seriam tabelas do banco, ligadas a cada aluno. O back-end, em Python, checaria no servidor quem pode comentar ou moderar, e a API entregaria os comentários novos quase em tempo real. Denúncias iriam para uma fila de moderação, com cuidado extra com menores (LGPD).', tech:['Python','PostgreSQL','API REST','WebSocket','Moderação']}
   },
   'screen-chat': {
-    mvp:  {title:'IA simulada', text:'Respostas prontas escritas no código. O que o aluno digita não é interpretado.', tech:['JS','Respostas fixas']},
-    real: {title:'IA da INQUIRA', text:'Integração via API com um modelo de linguagem, instruído a guiar o raciocínio em vez de entregar a resposta.', tech:['API','Modelo de linguagem']}
+    mvp:  {title:'IA simulada', text:'As respostas estão prontas, escritas no código JS. O que o aluno digita não é interpretado: o botão só espera um tempo e mostra o texto fixo. O HTML e o CSS fazem apenas a aparência do chat.', tech:['HTML','CSS','JS']},
+    real: {title:'IA da INQUIRA', text:'O front-end enviaria a pergunta ao back-end, que chamaria a API de um modelo de linguagem com instruções para guiar o raciocínio, sem entregar a resposta pronta. A chave de acesso ficaria guardada só no servidor, nunca no navegador, e dados pessoais de menores não seriam enviados (LGPD).', tech:['Python','API de modelo de linguagem','Chave de API no servidor','LGPD']}
+  },
+  'screen-thanks': {
+    mvp:  {title:'Encerramento', text:'Tela estática em HTML e CSS. O único botão chama goTo() e volta ao Login para reiniciar a demonstração. Nada é salvo ou enviado.', tech:['HTML','CSS','JS']},
+    real: {title:'Logout e sessão', text:'Na plataforma de fato, o encerramento seria a saída da conta (logout) e o retorno ao login, com a sessão encerrada no servidor.', tech:['Sessão','Logout','API REST']}
   }
 };
 
@@ -243,22 +255,165 @@ function chatQuick(type){
   scroll.scrollTop = scroll.scrollHeight;
 }
 
-renderNotes('screen-login');
+/* =========================================================
+   GRUPOS DE ESTUDO (simulado — tudo fica só na memória)
+   Visões: 'list' (Meus grupos / Explorar), 'detail' (comentários), 'create'.
+   Dados de exemplo; initGroups() recomeça do zero a cada vez que a tela abre.
+   ========================================================= */
+const grpSubjects = ['Matemática','Português','Física','Química','Geografia'];
+function grpDefaults(){
+  return [
+    {id:1, name:'Trigonometria na Prática', subject:'Matemática', members:12, joined:true, admin:false, posts:[
+      {a:'Ana P.',  t:'Alguém conseguiu a questão 3 da lista de seno e cosseno? Travei na hora de montar a proporção.', likes:3, liked:false, reported:false},
+      {a:'Lucas M.',t:'Tenta achar primeiro o lado oposto ao ângulo dado. Depois a proporção sai quase sozinha.', likes:5, liked:false, reported:false}
+    ]},
+    {id:2, name:'Redação ENEM', subject:'Português', members:24, joined:false, admin:false, posts:[
+      {a:'Beatriz S.', t:'Vamos combinar uma proposta de intervenção por semana e comentar a do outro?', likes:7, liked:false, reported:false}
+    ]},
+    {id:3, name:'Física: Mecânica', subject:'Física', members:9, joined:false, admin:false, posts:[
+      {a:'Rafael T.', t:'Quem tem um bom resumo de leis de Newton para compartilhar?', likes:2, liked:false, reported:false}
+    ]},
+    {id:4, name:'Química Orgânica', subject:'Química', members:15, joined:false, admin:false, posts:[
+      {a:'Júlia C.', t:'Dica: montar um quadro com as funções orgânicas ajuda muito na revisão.', likes:4, liked:false, reported:false}
+    ]}
+  ];
+}
+let grpData = [], grpTab = 'mine', grpView = 'list', grpOpen = null, grpNewSubject = 'Matemática', grpNextId = 100;
 
-/* Relógio em tempo real na barra de status do celular */
-function iniciarRelogioCelular() {
-  const clockEl = document.getElementById('status-clock');
-  if (!clockEl) return;
+function grpEsc(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function grpInitials(n){
+  return n.split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('');
+}
+function grpFind(id){ return grpData.find(g=>g.id===id); }
 
-  function atualizar() {
-    const agora = new Date();
-    // Formata para exibir apenas Hora:Minuto (ex: 14:32)
-    clockEl.textContent = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  }
+function initGroups(){
+  grpData = grpDefaults();
+  grpTab = 'mine'; grpView = 'list'; grpOpen = null; grpNewSubject = grpSubjects[0];
+  renderGroups();
+}
+function renderGroups(){
+  const body = document.getElementById('grpBody');
+  const footer = document.getElementById('grpFooter');
+  footer.style.display = (grpView === 'detail') ? 'flex' : 'none';
+  if(grpView === 'detail') return renderGroupDetail(body);
+  if(grpView === 'create') return renderGroupCreate(body);
 
-  atualizar();
-  setInterval(atualizar, 60000); // Atualiza a cada 1 minuto
+  const list = grpData.filter(g => grpTab==='mine' ? g.joined : !g.joined);
+  const cards = list.map(g=>`
+    <div class="card grp-card" onclick="grpOpenDetail(${g.id})">
+      <div class="info">
+        <div class="name">${grpEsc(g.name)}${g.admin?'<span class="grp-badge">ADMIN</span>':''}</div>
+        <div class="meta">${grpEsc(g.subject)} · ${g.members} ${g.members===1?'membro':'membros'}</div>
+      </div>
+      ${g.joined ? '' : `<button class="grp-btn" onclick="event.stopPropagation();grpToggleJoin(${g.id})">Entrar</button>`}
+    </div>`).join('');
+  const empty = grpTab==='mine'
+    ? `<div class="card grp-empty"><div class="muted" style="margin-bottom:12px;">Você ainda não participa de nenhum grupo.</div><button class="grp-btn" onclick="grpSetTab('explore')">Explorar grupos</button></div>`
+    : `<div class="card grp-empty"><div class="muted">Você já participa de todos os grupos de exemplo.</div></div>`;
+  body.innerHTML = `
+    <div class="grp-head">
+      <div><h2 class="h-serif">Grupos de estudo</h2><div class="muted">Estude junto com outros alunos</div></div>
+      <button class="grp-new" onclick="grpShowCreate()">+ Criar</button>
+    </div>
+    <div class="tab-pill-row">
+      <button class="${grpTab==='mine'?'active':''}" onclick="grpSetTab('mine')">Meus grupos</button>
+      <button class="${grpTab==='explore'?'active':''}" onclick="grpSetTab('explore')">Explorar</button>
+    </div>
+    ${cards || empty}`;
+}
+function grpSetTab(t){ grpTab = t; grpView = 'list'; renderGroups(); }
+function grpToggleJoin(id){
+  const g = grpFind(id); if(!g) return;
+  g.joined = !g.joined;
+  g.members += g.joined ? 1 : -1;
+  renderGroups();
+}
+function grpOpenDetail(id){ grpOpen = id; grpView = 'detail'; renderGroups(); }
+function grpBack(){ grpView = 'list'; grpOpen = null; renderGroups(); }
+
+function renderGroupDetail(body){
+  const g = grpFind(grpOpen); if(!g) return grpBack();
+  const posts = g.posts.map((p,i)=>`
+    <div class="card grp-post">
+      <div class="top"><div class="grp-av">${grpEsc(grpInitials(p.a))}</div><div class="who">${grpEsc(p.a)}</div></div>
+      <div class="txt">${grpEsc(p.t)}</div>
+      <div class="acts">
+        <button class="grp-act ${p.liked?'on':''}" onclick="grpLike(${i})">${p.liked?'♥':'♡'} Curtir · ${p.likes}</button>
+        <button class="grp-act ${p.reported?'on':''}" ${p.reported?'disabled':''} onclick="grpReport(${i})">${p.reported?'Denunciado ✓':'Denunciar'}</button>
+      </div>
+    </div>`).join('');
+  body.innerHTML = `
+    <button class="grp-back" onclick="grpBack()">‹ Voltar</button>
+    <div class="grp-head">
+      <div>
+        <h2 class="h-serif">${grpEsc(g.name)}</h2>
+        <div class="muted">${grpEsc(g.subject)} · ${g.members} ${g.members===1?'membro':'membros'}${g.admin?' · você é admin':''}</div>
+      </div>
+      <button class="grp-btn ${g.joined?'ghost':''}" onclick="grpToggleJoin(${g.id})">${g.joined?'Sair':'Entrar'}</button>
+    </div>
+    <div class="section-title">COMENTÁRIOS</div>
+    ${posts || '<div class="card grp-empty"><div class="muted">Ainda não há comentários. Seja a primeira pessoa a escrever!</div></div>'}`;
+  const input = document.getElementById('grpInput');
+  input.disabled = !g.joined;
+  input.value = '';
+  input.placeholder = g.joined ? 'Escreva um comentário...' : 'Entre no grupo para comentar';
+  grpCheckInput();
+}
+function grpCheckInput(){
+  const input = document.getElementById('grpInput');
+  document.getElementById('grpSendBtn').classList.toggle('ready', !input.disabled && input.value.trim().length > 0);
+}
+function grpSendComment(){
+  const g = grpFind(grpOpen); const input = document.getElementById('grpInput');
+  const txt = input.value.trim();
+  if(!g || !g.joined || !txt) return;
+  g.posts.push({a:'Você', t:txt, likes:0, liked:false, reported:false});
+  renderGroups();
+  const body = document.getElementById('grpBody'); body.scrollTop = body.scrollHeight;
+}
+function grpLike(i){
+  const p = grpFind(grpOpen).posts[i];
+  p.liked = !p.liked; p.likes += p.liked ? 1 : -1;
+  const keep = document.getElementById('grpBody').scrollTop;
+  renderGroups(); document.getElementById('grpBody').scrollTop = keep;
+}
+function grpReport(i){
+  grpFind(grpOpen).posts[i].reported = true;
+  const keep = document.getElementById('grpBody').scrollTop;
+  renderGroups(); document.getElementById('grpBody').scrollTop = keep;
 }
 
-// Executa a função assim que o script carregar
-iniciarRelogioCelular();
+function grpShowCreate(){ grpView = 'create'; renderGroups(); }
+function renderGroupCreate(body){
+  body.innerHTML = `
+    <button class="grp-back" onclick="grpBack()">‹ Cancelar</button>
+    <h2 class="h-serif">Novo grupo</h2>
+    <div class="muted">Convide colegas para estudar o mesmo tema</div>
+    <div class="grp-form">
+      <label for="grpName">Nome do grupo</label>
+      <input type="text" id="grpName" maxlength="30" placeholder="Ex.: Geometria para o ENEM" oninput="grpCheckName()">
+      <label>Matéria</label>
+      <div class="grp-chips">
+        ${grpSubjects.map(s=>`<button class="chip ${s===grpNewSubject?'active':''}" onclick="grpPickSubject('${s}')">${s}</button>`).join('')}
+      </div>
+    </div>
+    <button class="btn-gold" id="grpCreateBtn" style="margin-top:22px;" onclick="grpCreate()" disabled>Criar grupo</button>`;
+}
+function grpCheckName(){
+  document.getElementById('grpCreateBtn').disabled = document.getElementById('grpName').value.trim().length === 0;
+}
+function grpPickSubject(s){
+  const name = document.getElementById('grpName').value;
+  grpNewSubject = s; renderGroups();
+  const el = document.getElementById('grpName'); el.value = name; grpCheckName();
+}
+function grpCreate(){
+  const name = document.getElementById('grpName').value.trim();
+  if(!name) return;
+  grpData.unshift({id:grpNextId++, name, subject:grpNewSubject, members:1, joined:true, admin:true, posts:[]});
+  grpTab = 'mine'; grpView = 'list'; renderGroups();
+}
+
+renderNotes('screen-login');

@@ -35,7 +35,7 @@
       <div class="phone">
         <div class="phone-screen">
           <div class="status-bar">
-            <span class="time" id="status-clock">9:41</span>
+            <span>9:41</span>
             <span class="icons">
               <span class="bars"><span></span><span></span><span></span><span></span></span>
               <span class="battery"></span>
@@ -98,6 +98,8 @@
               </div>
               <div class="tiles-row">
                 <div class="tile" onclick="goTo('screen-exam')"><div class="ic">⏱</div><div class="lbl">Simulado</div></div>
+                <div class="tile" onclick="goTo('screen-groups')"><div class="ic">👥</div><div class="lbl">Grupos</div></div>
+                <div class="tile" onclick="goTo('screen-library')"><div class="ic">📖</div><div class="lbl">Biblioteca</div></div>
               </div>
             </div>
             <div class="bottom-nav">
@@ -214,6 +216,21 @@
             </div>
           </div>
 
+          <!-- ============ STUDY GROUPS ============ -->
+          <div class="screen" id="screen-groups">
+            <div class="screen-body" id="grpBody"></div>
+            <div class="chat-input-row" id="grpFooter" style="padding:10px 18px;display:none;">
+              <input type="text" id="grpInput" placeholder="Escreva um comentário..." maxlength="200" oninput="grpCheckInput()" onkeydown="if(event.key==='Enter')grpSendComment()">
+              <button class="send-btn" id="grpSendBtn" onclick="grpSendComment()">➤</button>
+            </div>
+            <div class="bottom-nav">
+              <div class="item" onclick="goTo('screen-home')"><div class="dot"></div>Início</div>
+              <div class="item" onclick="goTo('screen-path')"><div class="dot"></div>Trilhas</div>
+              <div class="item" onclick="goTo('screen-chat')"><div class="dot"></div>IA</div>
+              <div class="item" onclick="goTo('screen-profile')"><div class="dot"></div>Perfil</div>
+            </div>
+          </div>
+
           <!-- ============ AI CHAT ============ -->
           <div class="screen" id="screen-chat">
             <div class="screen-body">
@@ -229,9 +246,57 @@
                 <button class="chip" onclick="chatQuick('resolucao')">Ver resolução</button>
               </div>
             </div>
-            <div class="chat-input-row" style="padding:0 18px 16px;">
+            <div class="chat-input-row" style="padding:10px 18px;">
               <input type="text" id="chatInput" placeholder="Digite sua dúvida..." oninput="checkChatInput()">
               <button class="send-btn" id="sendBtn" onclick="sendChat()">➤</button>
+            </div>
+            <div class="bottom-nav">
+              <div class="item" onclick="goTo('screen-home')"><div class="dot"></div>Início</div>
+              <div class="item" onclick="goTo('screen-path')"><div class="dot"></div>Trilhas</div>
+              <div class="item active" onclick="goTo('screen-chat')"><div class="dot"></div>IA</div>
+              <div class="item" onclick="goTo('screen-profile')"><div class="dot"></div>Perfil</div>
+            </div>
+          </div>
+
+          <!-- ============ BIBLIOTECA DIGITAL ============ -->
+          <div class="screen" id="screen-library">
+            <div class="screen-body">
+              <h2 class="h-serif">Biblioteca Digital</h2>
+              <div class="muted" style="margin-bottom:14px;">Materiais, resumos e apostilas oficiais</div>
+              <div class="tab-pill-row">
+                <button class="active" onclick="libSetTab(this,'all')">Todos</button>
+                <button onclick="libSetTab(this,'resumos')">Resumos</button>
+                <button onclick="libSetTab(this,'apostilas')">Apostilas</button>
+              </div>
+              <div id="libList">
+                <!-- Preenchido via script.js -->
+              </div>
+            </div>
+            <div class="bottom-nav">
+              <div class="item" onclick="goTo('screen-home')"><div class="dot"></div>Início</div>
+              <div class="item" onclick="goTo('screen-path')"><div class="dot"></div>Trilhas</div>
+              <div class="item" onclick="goTo('screen-chat')"><div class="dot"></div>IA</div>
+              <div class="item" onclick="goTo('screen-profile')"><div class="dot"></div>Perfil</div>
+            </div>
+          </div>
+
+          <!-- ============ AGRADECIMENTO ============ -->
+          <div class="screen" id="screen-thanks">
+            <div class="screen-body">
+              <div class="logo-mark on-light thanks-logo"></div>
+              <h2 class="h-serif thanks-title">Obrigado!</h2>
+              <div class="hairline thanks-line"></div>
+              <p class="thanks-sub">Protótipo de apresentação do TCC<br>Curso Técnico em Desenvolvimento de Sistemas · 2026</p>
+              <div class="card thanks-card">
+                <div class="thanks-label">EQUIPE</div>
+                <ul class="thanks-team">
+                  <li>Carlos Yuri de Araújo Macedo</li>
+                  <li>Chiara Cezar Alves da Silva</li>
+                  <li>Otávio Gasparetto Rodrigues da Silva</li>
+                </ul>
+                <div class="thanks-school">E.E. Professora Carolina Cintra da Silveira<br>São Paulo · 2026</div>
+              </div>
+              <button class="btn-gold thanks-btn" onclick="goTo('screen-login')">Voltar à tela de login</button>
             </div>
           </div>
 

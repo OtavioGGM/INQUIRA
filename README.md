@@ -16,13 +16,26 @@ Leia isto primeiro. Contexto completo do projeto em poucas linhas.
 - Tecnologia: **HTML + CSS + JavaScript puro**. Sem framework, sem build, sem dependência npm.
 - Abra `inquira_prototipo.html` no navegador. Pronto.
 
+## Metodologia do MVP
+
+O protótipo segue o método **Mágico de Oz**: a interface parece funcionar, mas o funcionamento é simulado por trás. Etapas, na mesma ordem do slide 4 da apresentação (`INQUIRA.pptx`):
+
+1. **Levantar**: formulário com o público-alvo, para entender necessidades (desmotivação, foco, interesse por jogos, personalização).
+2. **Priorizar**: Matriz MoSCoW, mantendo só o essencial para a demonstração. Outras ferramentas de planejamento: metas SMART, Mapa da Empatia e Matriz CSD (slide 2).
+3. **Prototipar**: 9 telas em HTML, CSS e JS puros, só front-end.
+4. **Simular**: dados fixos e respostas prontas, sem back-end, banco de dados, API, login real ou IA real.
+5. **Explicar**: em cada tela, dois balões separam o que é **MVP** (como funciona neste protótipo) do que seria a **plataforma de fato** (proposta futura).
+
+O que o protótipo **não** é: não coleta dados, não substitui testes com usuários reais e não comprova a eficácia pedagógica. Em textos do TCC, descreva-o como demonstração da proposta.
+
 ## Arquivos
 
 | Arquivo | Função |
 |---|---|
-| `inquira_prototipo.html` | Estrutura: barra superior, celular com as 8 telas, balões de apoio |
+| `inquira_prototipo.html` | Estrutura: barra superior, celular com as 9 telas, balões de apoio |
 | `style.css` | Todo o visual: variáveis de cor/fonte, celular, telas, balões |
 | `script.js` | Navegação, interações simuladas, textos dos balões (`notes`) |
+| `INQUIRA.pptx` | Apresentação do TCC. Slide 4 = metodologia do MVP (ver seção acima) |
 | `logo-inquira.png` | Logo. Não vem no pacote. O usuário coloca na mesma pasta |
 
 Fonte **Comfortaa** vem do Google Fonts (precisa de internet). Sem internet, cai em `sans-serif`. Times New Roman é fonte do sistema.
@@ -40,7 +53,7 @@ Fonte **Comfortaa** vem do Google Fonts (precisa de internet). Sem internet, cai
 - `.stage-right`: dois balões (`#balloonMvp`, `#balloonReal`) para apoio do apresentador.
 - Abaixo de 1000px de largura tudo empilha.
 
-## Telas (8)
+## Telas (9)
 
 Cada tela é um `div.screen` com `id`. Só uma tem a classe `active`. A lista `screens` no `script.js` define ordem e rótulo das pílulas.
 
@@ -53,19 +66,21 @@ Cada tela é um `div.screen` com `id`. Só uma tem a classe `active`. A lista `s
 | 5 | `screen-lesson` | Aula | Caixa de vídeo falsa. Abas Vídeo / Notas / Recursos |
 | 6 | `screen-exercises` | Exercícios | 3 questões de trigonometria, +30 XP por acerto |
 | 7 | `screen-exam` | Simulado | Cronômetro regressivo, grade de 16 questões, 1 questão exemplo |
-| 8 | `screen-chat` | Chat IA | Respostas prontas. Texto digitado não é interpretado |
+| 8 | `screen-groups` | Grupos | Grupos de estudo (visão do aluno): entrar/sair, criar, comentar, curtir, denunciar. Estado só em memória |
+| 9 | `screen-chat` | Chat IA | Respostas prontas. Texto digitado não é interpretado |
 
 Navegação: pílulas, setas ‹ ›, atalhos da home (`goTo('screen-...')`) e teclado ← → (desligado ao digitar).
 
 ## `script.js` — mapa
 
 - `screens`, `current`: lista de telas e índice atual.
-- `goTo(id)`: troca tela, atualiza pílula, título, contador, chama `renderNotes(id)` e inicializa telas dinâmicas (`initExercises`, `initExamGrid`).
+- `goTo(id)`: troca tela, atualiza pílula, título, contador, chama `renderNotes(id)` e inicializa telas dinâmicas (`initExercises`, `initExamGrid`, `initGroups`).
 - `prevScreen()` / `nextScreen()`: navegação circular.
 - `setLoginMode(mode)`: `'login'` ou `'signup'`.
 - `lessonTabs` + `setLessonTab(btn, tab)`: conteúdo das abas da aula.
 - Exercícios: `exQuestions` (array), `initExercises`, `renderExercise`, `selectExOption`, `exAction`. Acerto = +30 XP.
 - `initExamGrid()`, `selectExamOption(el)`: grade de questões e cronômetro (começa em 04:58:32). Roda uma vez.
+- Grupos: `grpDefaults()` (4 grupos de exemplo), `initGroups()` (zera o estado a cada abertura), `renderGroups()` e as visões `list` / `detail` / `create`. Ações: `grpToggleJoin`, `grpSendComment`, `grpLike`, `grpReport`, `grpCreate`. Só quem entrou no grupo comenta. Textos digitados passam por `grpEsc()` antes de entrar no HTML.
 - Chat: `checkChatInput`, `sendChat` (responde com texto pronto após 1100 ms), `chatQuick('dica' | 'resolucao')`.
 - **Balões**: objeto `notes`, `renderNotes(id)`. Veja abaixo.
 
@@ -97,8 +112,8 @@ Objeto `notes` no `script.js`. Uma chave por id de tela:
 
 ## Escopo — status das funcionalidades
 
-- **Implementado (simulado no protótipo)**: as 8 telas acima.
-- **Proposto / futuro** (não existe aqui): login real, banco de dados, API, IA real, Speed Quiz e demais jogos educativos, tela de Progresso com histórico de atividade, grupos de estudo, chat colaborativo, amigos, biblioteca digital, loja virtual, conteúdo premium, pagamento, doações, moderação, denúncias, certificação por instituições parceiras.
+- **Implementado (simulado no protótipo)**: as 9 telas acima.
+- **Proposto / futuro** (não existe aqui): login real, banco de dados, API, IA real, Speed Quiz e demais jogos educativos, tela de Progresso com histórico de atividade, grupos de estudo reais (com contas, banco de dados e comentários compartilhados entre pessoas), chat colaborativo, amigos, biblioteca digital, loja virtual, conteúdo premium, pagamento, doações, moderação de verdade (o botão Denunciar do protótipo só muda o texto na tela), certificação por instituições parceiras.
 - Em textos para o TCC, trate INQUIRA como proposta. Use "propõe", "busca", "pretende", "pode". Nunca afirme que resolve o problema.
 
 ## Regras para IAs que editam este projeto
@@ -115,6 +130,8 @@ Objeto `notes` no `script.js`. Uma chave por id de tela:
 
 ## Histórico de alterações
 
+- Adicionada a tela **Grupos** (9 telas): visão do estudante com Meus grupos / Explorar, entrar e sair, criar grupo, comentar, curtir e denunciar. É simulada: dados de exemplo no script, nada é salvo ou compartilhado, e a tela recomeça do zero ao ser aberta. Acesso pelo atalho "Grupos" na Home e pelas pílulas do topo.
+- Adicionado o **slide 4** à apresentação (`INQUIRA.pptx`), sobre a metodologia do MVP, e documentada a metodologia neste README.
 - Removidas as telas **Speed Quiz** e **Progresso** (HTML, CSS, JS e balões). O protótipo passou de 10 para 8 telas. Jogos educativos e histórico de atividade continuam como **proposta futura**. Estatísticas, conquistas e domínio por matéria permanecem na tela de Perfil.
 - A barra inferior do celular agora tem 4 itens: Início, Trilhas, IA e Perfil.
 - A Home mantém só o atalho do Simulado.
