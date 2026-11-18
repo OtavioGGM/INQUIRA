@@ -149,19 +149,19 @@
             </div>
           </div>
 
-          <!-- ============ LEARNING PATH ============ -->
+          <!-- ============ LEARNING PATH (mapa de hexágonos) ============ -->
           <div class="screen" id="screen-path">
-            <div class="screen-body">
-              <h2 class="h-serif">Trilha: Trigonometria</h2>
-              <div class="muted" style="margin-bottom:14px;">4 de 6 módulos concluídos</div>
-              <div class="path-list">
-                <div class="path-item done"><div class="node">✓</div><div class="card"><div class="name">Ângulos e Triângulos</div><div class="meta">Concluído · +40 XP</div></div></div>
-                <div class="path-item done"><div class="node">✓</div><div class="card"><div class="name">Seno e Cosseno</div><div class="meta">Concluído · +40 XP</div></div></div>
-                <div class="path-item done"><div class="node">✓</div><div class="card"><div class="name">Tangente</div><div class="meta">Concluído · +40 XP</div></div></div>
-                <div class="path-item current"><div class="node">4</div><div class="card" onclick="goTo('screen-lesson')"><div class="name">Lei dos Senos</div><div class="meta">Em andamento · 68%</div></div></div>
-                <div class="path-item locked"><div class="node">🔒</div><div class="card"><div class="name">Lei dos Cossenos</div><div class="meta">Bloqueado</div></div></div>
-                <div class="path-item locked"><div class="node">🔒</div><div class="card"><div class="name">Aplicações no ENEM</div><div class="meta">Bloqueado</div></div></div>
+            <div class="path-stage" id="pathStage">
+              <div class="screen-body" id="pathBody" onclick="pathClose()">
+                <h2 class="h-serif">Trilha: Trigonometria</h2>
+                <div class="muted" id="pathSummary" style="margin-bottom:6px;"></div>
+                <div class="path-legend">
+                  <span><i class="lg done"></i>Concluído</span>
+                  <span><i class="lg todo"></i>Não concluído</span>
+                </div>
+                <div id="pathMap"></div>
               </div>
+              <div class="path-sheet" id="pathSheet" onclick="event.stopPropagation()"></div>
             </div>
             <div class="bottom-nav">
               <div class="item" onclick="goTo('screen-home')"><div class="dot"></div>Início</div>
@@ -296,7 +296,7 @@
                 </ul>
                 <div class="thanks-school">E.E. Professora Carolina Cintra da Silveira<br>São Paulo · 2026</div>
               </div>
-              <button class="btn-gold thanks-btn" onclick="goTo('screen-login')">Voltar à tela de login</button>
+              <button class="btn-gold thanks-btn" onclick="goTo('screen-login')">Reiniciar apresentação</button>
             </div>
           </div>
 

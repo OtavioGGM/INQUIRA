@@ -36,6 +36,7 @@ function goTo(id){
   if(id==='screen-exercises') initExercises();
   if(id==='screen-exam') initExamGrid();
   if(id==='screen-groups') initGroups();
+  if(id==='screen-path') pathClose();
 }
 
 /* =========================================================
@@ -60,7 +61,7 @@ const notes = {
     real: {title:'Perfil dinâmico', text:'XP, nível, sequência e conquistas seriam calculados no servidor por regras de gamificação, e não no navegador, para o aluno não conseguir alterar a própria pontuação. Cada evento (aula, acerto) seria gravado no banco e o perfil, somado a partir dele.', tech:['Python','Regras de gamificação','Banco de dados','API REST']}
   },
   'screen-path': {
-    mvp:  {title:'Trilha estática', text:'Os estados concluído, atual e bloqueado são classes CSS aplicadas à mão em cada módulo do HTML. O JS apenas abre a aula ao clicar. Não existe controle real de quem avançou.', tech:['HTML','CSS','JS']},
+    mvp:  {title:'Mapa de trilha estático', text:'O mapa é um SVG desenhado pelo JS a partir de uma lista fixa de 6 módulos. Concluído = hexágono dourado; não concluído = só contorno com fundo escuro. Ao clicar, o JS abre o painel com as informações. O estado de cada módulo está escrito no código: não existe controle real de quem avançou.', tech:['HTML','SVG','CSS','JS']},
     real: {title:'Trilha por progresso', text:'Trilhas e módulos seriam tabelas do banco, ligadas ao progresso de cada aluno. Ao concluir uma etapa, o back-end registra e libera a próxima. A liberação é checada no servidor, então um módulo bloqueado não abre nem por tentativa direta na API.', tech:['Python','PostgreSQL','Relação entre tabelas','API REST']}
   },
   'screen-lesson': {
@@ -125,6 +126,84 @@ document.addEventListener('keydown', e=>{
 
 function prevScreen(){ goTo(screens[(current-1+screens.length)%screens.length].id); }
 function nextScreen(){ goTo(screens[(current+1)%screens.length].id); }
+
+/* TRILHA — mapa de hexágonos
+   status: 'done' (preenchido em dourado) | 'current' e 'locked' (só contorno, fundo escuro) */
+const pathModules = [
+  {name:'Ângulos e Triângulos', status:'done',    xp:40, parts:['Vídeo','Exercícios'], desc:'Classificação de triângulos e medida de ângulos. É a base para tudo o que vem depois na trilha.'},
+  {name:'Seno e Cosseno',       status:'done',    xp:40, parts:['Vídeo','Exercícios'], desc:'Razões trigonométricas no triângulo retângulo, partindo dos ângulos que você já conhece.'},
+  {name:'Tangente',             status:'done',    xp:40, parts:['Vídeo','Exercícios'], desc:'Terceira razão trigonométrica e como ela se relaciona com seno e cosseno.'},
+  {name:'Lei dos Senos',        status:'current', xp:50, parts:['Vídeo','Notas','Exercícios'], progress:68, desc:'Relaciona os lados de um triângulo qualquer aos senos dos ângulos opostos. Retoma o que você viu em Seno e Cosseno.'},
+  {name:'Lei dos Cossenos',     status:'locked',  xp:50, parts:['Vídeo','Exercícios'], desc:'Generaliza o Teorema de Pitágoras para triângulos quaisquer.', req:'Lei dos Senos'},
+  {name:'Aplicações no ENEM',   status:'locked',  xp:60, parts:['Questões','Simulado'], desc:'Questões contextualizadas no estilo do ENEM usando tudo o que a trilha cobriu.', req:'Lei dos Cossenos'}
+];
+let pathSel = -1;
+const PATH_X = [150,215,150,85,150,215], PATH_Y0 = 62, PATH_DY = 108, PATH_R = 34;
+
+function hexPoints(r){
+  const w = r*0.866;
+  return [[0,-r],[w,-r/2],[w,r/2],[0,r],[-w,r/2],[-w,-r/2]].map(p=>p.join(',')).join(' ');
+}
+function hexIcon(status){
+  if(status==='done') return '<path d="M-10 0 L-3 7 L11 -8" fill="none" stroke="#111111" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>';
+  if(status==='current') return '<path d="M-6 -9 L10 0 L-6 9 Z" fill="#C9A227" stroke="#C9A227" stroke-width="2" stroke-linejoin="round"/>';
+  return '<rect x="-8" y="-3" width="16" height="12" rx="2.5" fill="#8C6F1D"/><path d="M-5 -3 V-7 a5 5 0 0 1 10 0 V-3" fill="none" stroke="#8C6F1D" stroke-width="2.6" stroke-linecap="round"/>';
+}
+function renderPath(){
+  const n = pathModules.length, H = PATH_Y0 + (n-1)*PATH_DY + 70;
+  const doneCount = pathModules.filter(m=>m.status==='done').length;
+  document.getElementById('pathSummary').textContent = `${doneCount} de ${n} módulos concluídos`;
+  let links = '', nodes = '';
+  for(let i=0;i<n-1;i++){
+    const x1=PATH_X[i], y1=PATH_Y0+i*PATH_DY, x2=PATH_X[i+1], y2=PATH_Y0+(i+1)*PATH_DY, ym=(y1+y2)/2;
+    const reached = pathModules[i+1].status!=='locked';
+    links += `<path d="M${x1} ${y1} C${x1} ${ym} ${x2} ${ym} ${x2} ${y2}" fill="none" stroke="${reached?'#C9A227':'#3a3a3d'}" stroke-width="${reached?4:3}" stroke-linecap="round"${reached?'':' stroke-dasharray="1 9"'}/>`;
+  }
+  pathModules.forEach((m,i)=>{
+    const x=PATH_X[i], y=PATH_Y0+i*PATH_DY, done=m.status==='done', locked=m.status==='locked';
+    const fill = done ? '#C9A227' : '#222222';
+    const stroke = locked ? '#8C6F1D' : '#C9A227';
+    const ring = m.status==='current' ? `<polygon class="hex-ring" points="${hexPoints(PATH_R)}" fill="none" stroke="#C9A227" stroke-width="2"/>` : '';
+    const here = m.status==='current' ? `<g transform="translate(0,${-PATH_R-15})"><rect x="-42" y="-9" width="84" height="17" rx="8.5" fill="#C9A227"/><text class="hex-here" text-anchor="middle" y="3" fill="#111111">VOCÊ ESTÁ AQUI</text></g>` : '';
+    const state = done?'concluído':(locked?'bloqueado':'em andamento');
+    nodes += `<g class="hex ${m.status}${i===pathSel?' sel':''}" transform="translate(${x},${y})" tabindex="0" role="button" aria-label="${m.name}, ${state}" onclick="event.stopPropagation();pathSelect(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pathSelect(${i});}">
+      ${ring}<g class="hex-shape"><polygon points="${hexPoints(PATH_R)}" fill="${fill}" stroke="${stroke}" stroke-width="3.5" stroke-linejoin="round"/>${hexIcon(m.status)}</g>
+      ${here}<text class="hex-label" y="${PATH_R+20}">${m.name}</text></g>`;
+  });
+  document.getElementById('pathMap').innerHTML = `<svg viewBox="0 0 300 ${H}" xmlns="http://www.w3.org/2000/svg">${links}${nodes}</svg>`;
+}
+function pathSelect(i){
+  pathSel = i; renderPath();
+  const m = pathModules[i];
+  const label = {done:'CONCLUÍDO', current:'EM ANDAMENTO', locked:'BLOQUEADO'}[m.status];
+  const prog = m.status==='current' ? `<div class="xp-bar-track" style="margin:0 0 12px;"><div class="xp-bar-fill" style="width:${m.progress}%;"></div></div>` : '';
+  let btn;
+  if(m.status==='current') btn = `<button class="btn-gold sheet-btn" onclick="goTo('screen-lesson')">Continuar · ${m.progress}%</button>`;
+  else if(m.status==='done') btn = `<button class="btn-gold sheet-btn ghost" onclick="goTo('screen-lesson')">Revisar módulo</button>`;
+  else btn = `<button class="btn-gold sheet-btn" disabled>Conclua “${m.req}” para liberar</button>`;
+  document.getElementById('pathSheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3 class="sheet-title">${m.name}</h3><button class="sheet-close" onclick="pathClose()" aria-label="Fechar">×</button></div>
+    <span class="sheet-status ${m.status}">${label}</span>
+    <p class="sheet-desc">${m.desc}</p>
+    ${prog}
+    <div class="sheet-meta"><span>Módulo ${i+1} de ${pathModules.length}</span><span>+${m.xp} XP</span>${m.parts.map(p=>`<span>${p}</span>`).join('')}</div>
+    ${btn}`;
+  document.getElementById('pathStage').classList.add('open');
+  /* rola o mapa para o hexágono ficar visível acima do painel */
+  const body = document.getElementById('pathBody'), sheet = document.getElementById('pathSheet');
+  body.style.paddingBottom = (sheet.offsetHeight + 24) + 'px';
+  const node = document.querySelectorAll('#pathMap .hex')[i];
+  const visible = body.clientHeight - sheet.offsetHeight;
+  const delta = (node.getBoundingClientRect().top + node.getBoundingClientRect().height/2) - (body.getBoundingClientRect().top + visible/2);
+  body.scrollBy({top:delta, behavior:'smooth'});
+}
+function pathClose(){
+  pathSel = -1;
+  document.getElementById('pathStage').classList.remove('open');
+  document.getElementById('pathBody').style.paddingBottom = '';
+  renderPath();
+}
 
 /* LOGIN */
 function setLoginMode(mode){
@@ -417,3 +496,5 @@ function grpCreate(){
 }
 
 renderNotes('screen-login');
+
+renderPath();
